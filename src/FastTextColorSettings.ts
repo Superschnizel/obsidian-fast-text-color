@@ -1,10 +1,11 @@
 import FastTextColorPlugin from 'main';
-import { App, Notice, PluginSettingTab, Setting } from "obsidian";
+import { App, ButtonComponent, Notice, PluginSettingTab, Setting } from "obsidian";
 import { TextColor } from "./color/TextColor";
 import { TextColorTheme } from "./color/TextColorTheme";
 import { confirmByModal } from "./utils/ConfirmationModal"
 import { CreateNewThemeModal } from './utils/CreateNewThemeModal';
 import { getKeyBindWithModal } from "./utils/KeyBindModal"
+import { validateColorName } from './utils/validateColorName';
 
 // --------------------------------------------------------------------------
 //                            CONSTANTS
@@ -283,13 +284,19 @@ export class FastTextColorPluginSettingTab extends PluginSettingTab {
 			count++;
 		});
 
-		new Setting(containerEl)
+		const addNewColorGroup = new Setting(containerEl)
 			.setName("Add new color to theme")
 			.setClass("ftc-settings-theme-footer")
 			.addText(txt => {
 				txt
 					.setValue(this.newId == '' ? (getColors(settings).length + 1).toString() : this.newId)
 					.onChange(value => {
+						const isValid = validateColorName(value);
+						const button = addNewColorGroup
+							.components.filter((component): component is ButtonComponent => 'buttonEl' in component)
+							.at(0);
+						button?.setDisabled(!isValid);
+						button?.setTooltip(isValid ? '' : 'The color name must not contain any whitespace characters.')
 						this.newId = value;
 					})
 			})
@@ -306,7 +313,7 @@ export class FastTextColorPluginSettingTab extends PluginSettingTab {
 						colors.push(new TextColor("#ffffff", newColorName, getCurrentTheme(settings, this.editThemeIndex).name));
 						await this.plugin.saveSettings();
 						this.display();
-					})
+					});
 			})
 		// .addButton(btn => {
 		// 	btn

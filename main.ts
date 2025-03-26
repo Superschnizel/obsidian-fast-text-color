@@ -7,6 +7,7 @@ import {
 	Scope,
 	ButtonComponent,
 	Modal,
+	WorkspaceWindow,
 } from 'obsidian';
 import { DEFAULT_SETTINGS, FastTextColorPluginSettingTab, FastTextColorPluginSettings, getColors, SETTINGS_VERSION, updateSettings, CSS_COLOR_PREFIX, getCurrentTheme } from 'src/FastTextColorSettings';
 import { TextColor } from 'src/color/TextColor';
@@ -30,12 +31,17 @@ export default class FastTextColorPlugin extends Plugin {
 	scope: Scope;
 
 	styleElement: HTMLElement;
+	styleElements: Map<Window, HTMLElement | null>;
+
+	lastActiveDoc: Document;
 
 	settingsExtension: Extension;
 	settingsCompartment: Compartment;
 
 	async onload() {
 		await this.loadSettings();
+
+		this.styleElements = new Map<Window, HTMLElement | null>();
 
 		// setup Editor Extensions
 		this.registerEditorExtension(textColorParserField);
@@ -114,13 +120,23 @@ export default class FastTextColorPlugin extends Plugin {
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new FastTextColorPluginSettingTab(this.app, this));
 
+		this.app.workspace.on("window-open", (_, window) => {
+			this.styleElements.set(window, null);
+			this.setCssVariables();
+		});
+		this.app.workspace.on("window-close", (_, window) => { this.styleElements.delete(window)});
+
+		this.styleElements.set(activeWindow, null);
+
 		this.setCssVariables();
 	}
 
 	onunload() {
-		this.styleElement.remove();
+		// this.styleElement.remove();
 		this.closeColorMenu();
 
+		// this.app.workspace.off("window-open", this.addWindow);
+		// this.app.workspace.off("window-close", this.removeWindow);
 		// remove editorextensions
 	}
 
@@ -328,43 +344,92 @@ export default class FastTextColorPlugin extends Plugin {
 			.buttonEl.setAttr("style", `background-color: ${tColor.getColorValue()}`);
 	}
 
+	addWindow(window: Window) {
+		this.styleElements.set(window, null);
+		this.setCssVariables();
+	}
+
+	removeWindow(window: Window) {
+		this.styleElements.delete(window);
+	}
+
 	/**
 	 * creates the stylesheet needed for the colors in the root of the document.
 	 * A different set of classes is created for each theme.
 	 *
 	 */
 	setCssVariables() {
-		if (!this.styleElement) {
-			const root = document.querySelector(':root');
+		// let styleElement = activeDocument.getElementById("fast-text-color-stylesheet");
 
-			if (!root) {
-				return;
+		// iterate over all known windows and create stylesheets if not already present.
+		this.styleElements.forEach((styleElement, win) => {
+			if (!styleElement) {
+				let root = win.document.querySelector(':root');
+
+				if (!root) {
+					return;
+				}
+
+				styleElement = root.createEl('style');
+				styleElement.id = "fast-text-color-stylesheet";
+
+				this.styleElements.set(win, styleElement);
 			}
 
-			this.styleElement = root.createEl('style');
-			this.styleElement.id = "fast-text-color-stylesheet";
+			styleElement.textContent = "";
+			const formatCss = (css: string) => {
+				const lines = css.split('\n').map(l => l.trim()).filter(l => l.length);
+				if (lines.length <= 5) { // format as a single line
+					return lines.join(' ');
+				}
+				return lines.map(l => /[{}]/.test(l) ? l : `  ${l}`).join('\n');
+			};
+			// dynamically create stylesheet.
+			for (let i = 0; i < this.settings.themes.length; i++) {
+				getColors(this.settings, i).forEach((tColor: TextColor) => {
 
-		}
+					const theme = this.settings.themes[i]
+					const className = `.${CSS_COLOR_PREFIX}${theme.name}-${tColor.id}`;
+					let cssClass = `${className} {\n${tColor.getInnerCss(this.settings)}\n}`;
 
-		this.styleElement.textContent = "";
-		const formatCss = (css: string) => {
-			const lines = css.split('\n').map(l => l.trim()).filter(l => l.length);
-			if (lines.length <= 5) { // format as a single line
-				return lines.join(' ');
+					styleElement!.textContent += formatCss(cssClass) + "\n";
+				});
 			}
-			return lines.map(l => /[{}]/.test(l) ? l : `  ${l}`).join('\n');
-		};
-		// dynamically create stylesheet.
-		for (let i = 0; i < this.settings.themes.length; i++) {
-			getColors(this.settings, i).forEach((tColor: TextColor) => {
+		});
 
-				const theme = this.settings.themes[i]
-				const className = `.${CSS_COLOR_PREFIX}${theme.name}-${tColor.id}`;
-				let cssClass = `${className} {\n${tColor.getInnerCss(this.settings)}\n}`;
-
-				this.styleElement.textContent += formatCss(cssClass) + "\n";
-			});
-		}
+		// if (!this.styleElement || this.lastActiveDoc != activeDocument) {
+		// 	const root = activeDocument.querySelector(':root');
+		//
+		// 	this.lastActiveDoc = activeDocument;
+		//
+		// 	if (!root) {
+		// 		return;
+		// 	}
+		//
+		// 	this.styleElement = root.createEl('style');
+		// 	this.styleElement.id = "fast-text-color-stylesheet";
+		//
+		// }
+		//
+		// this.styleElement.textContent = "";
+		// const formatCss = (css: string) => {
+		// 	const lines = css.split('\n').map(l => l.trim()).filter(l => l.length);
+		// 	if (lines.length <= 5) { // format as a single line
+		// 		return lines.join(' ');
+		// 	}
+		// 	return lines.map(l => /[{}]/.test(l) ? l : `  ${l}`).join('\n');
+		// };
+		// // dynamically create stylesheet.
+		// for (let i = 0; i < this.settings.themes.length; i++) {
+		// 	getColors(this.settings, i).forEach((tColor: TextColor) => {
+		//
+		// 		const theme = this.settings.themes[i]
+		// 		const className = `.${CSS_COLOR_PREFIX}${theme.name}-${tColor.id}`;
+		// 		let cssClass = `${className} {\n${tColor.getInnerCss(this.settings)}\n}`;
+		//
+		// 		this.styleElement!.textContent += formatCss(cssClass) + "\n";
+		// 	});
+		// }
 
 	}
 }

@@ -165,13 +165,14 @@ export default class FastTextColorPlugin extends Plugin {
 
 	// create and open the color menu
 	/**
-	 * opens the color menu and pushed the scope onto the keybindings.
+	 * opens the color menu and pushes the scope onto the keybindings.
 	 *
 	 * @param {Editor} editor - [TODO:description]
 	 */
 	openColorMenu(editor: Editor) {
+
+		// if keybindings are not used create a normal choice
 		if (!this.settings.useKeybindings) {
-			// if keybindings are not used create a normal choice
 			let modal = new ColorSuggestModal(this.app, getColors(this.settings), editor);
 			modal.open();
 			return;
@@ -205,7 +206,7 @@ export default class FastTextColorPlugin extends Plugin {
 
 		for (let i = 0; i < colors.length; i++) {
 			// console.log(colors[i].getColorValue());
-			
+
 			this.createColorItem(this.colorMenu, colors[i], i + 1, editor);
 		}
 

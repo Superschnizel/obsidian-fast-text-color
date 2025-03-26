@@ -3,6 +3,12 @@ import { Editor } from "obsidian";
 import { EditorView } from "@codemirror/view";
 import { textColorParserField } from "../rendering/TextColorStateField";
 
+/**
+ * Applies color to the selected text
+ *
+ * @param {TextColor} tColor - [TODO:description]
+ * @param {Editor} editor - [TODO:description]
+ */
 export function applyColor(tColor: TextColor, editor: Editor) {
 
 	let prefix = `~={${tColor.id}}`;
@@ -27,7 +33,25 @@ export function applyColor(tColor: TextColor, editor: Editor) {
 		return;
 	}
 
-	let selected = editor.getSelection();
+	// let selected = editor.getSelection();
+
+	let selections = editor.listSelections();
+	selections.forEach(element => {
+		let selected = editor.getRange(element.anchor, element.head);
+		let coloredText = `${prefix}${selected}${suffix}`;
+
+		editor.replaceRange(coloredText, element.anchor, element.head);
+
+		// move cursor one item to the right.
+		// could not find a way to query for last possible position, so trycatch is needed.
+		try {
+			let pos = editor.getCursor();
+			pos.ch = pos.ch + 1;
+			editor.setCursor(pos);
+		} catch {
+			return;
+		}
+	});
 
 	// TODO check if there already is some coloring applied somewhere near.
 	// for now just check if what is marked is already a colored section and trim tags:
@@ -36,19 +60,6 @@ export function applyColor(tColor: TextColor, editor: Editor) {
 	// 	selected = selected.replace(TRAILING_SPAN, '');
 	// }
 
-	let coloredText = `${prefix}${selected}${suffix}`;
-
-	editor.replaceSelection(coloredText);
-
-	// move cursor one item to the right.
-	// could not find a way to query for last possible position, so trycatch is needed.
-	try {
-		let pos = editor.getCursor();
-		pos.ch = pos.ch + 1;
-		editor.setCursor(pos);
-	} catch {
-		return;
-	}
 }
 
 /**

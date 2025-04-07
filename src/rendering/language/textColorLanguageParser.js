@@ -9,7 +9,7 @@ export const parser = LRParser.deserialize({
   maxTerm: 26,
   skippedNodes: [0],
   repeatNodeCount: 5,
-  tokenData: "%f~RcXY!^YZ!c]^!^pq!^qr!^rs!^s!_!^!_!`!p!`#O!^#O#P!}#P#S!^#S#T$q#T#r!^#r#s$v#s;'S!^;'S;=`%Z<%l~!^~O!^~~%a~!cOj~~!hPj~YZ!k~!pOb~~!uPj~#r#s!x~!}Oa~~#SXj~rs!^!P!Q!^#O#P!^#U#V!^#Y#Z!^#b#c!^#f#g!^#h#i!^#i#j#o~#rR!Q![#{!c!i#{#T#Z#{~$OR!Q![$X!c!i$X#T#Z$X~$[R!Q![$e!c!i$e#T#Z$e~$hR!Q![!^!c!i!^#T#Z!^~$vO[~~${Pj~!_!`%O~%RP#o#p%U~%ZOS~~%^P;=`<%l!^~%fOc~",
+  tokenData: "%i~RcXY!^YZ!c]^!^pq!^qr!^rs!^s!_!^!_!`!p!`#O!^#O#P!}#P#S!^#S#T$t#T#r!^#r#s$y#s;'S!^;'S;=`%^<%l~!^~O!^~~%d~!cOj~~!hPj~YZ!k~!pOb~~!uPj~#r#s!x~!}Oa~~#SYj~rs!^!P!Q!^#O#P!^#S#T!^#U#V!^#Y#Z!^#b#c!^#f#g!^#h#i!^#i#j#r~#uR!Q![$O!c!i$O#T#Z$O~$RR!Q![$[!c!i$[#T#Z$[~$_R!Q![$h!c!i$h#T#Z$h~$kR!Q![!^!c!i!^#T#Z!^~$yO[~~%OPj~!_!`%R~%UP#o#p%X~%^OS~~%aP;=`<%l!^~%iOc~",
   tokenizers: [1, new LocalTokenGroup("!X~R[X^wpqw#q#r|#y#zw$f$gw#BY#BZw$IS$I_w$I|$JOw$JT$JUw$KV$KWw&FU&FVw~~!R~|O_~~!ROV~~!WO^~~", 54, 6)],
   topRules: {"TextColor":[0,1]},
   tokenPrec: 230

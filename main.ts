@@ -216,7 +216,7 @@ export default class FastTextColorPlugin extends Plugin {
 
 		// add menu to the workspace, adapted from 
 		// cMenu https://github.com/chetachiezikeuzor/cMenu-Plugin/blob/master/src/modals/cMenuModal.ts#L5
-		document.body.querySelector(".mod-vertical.mod-root")?.insertAdjacentElement("afterbegin", this.colorMenu);
+		activeDocument.body.querySelector(".mod-vertical.mod-root")?.insertAdjacentElement("afterbegin", this.colorMenu);
 
 		let colors = getColors(this.settings);
 

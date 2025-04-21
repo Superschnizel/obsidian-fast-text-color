@@ -37,10 +37,18 @@ export function applyColor(tColor: TextColor, editor: Editor) {
 
 	let selections = editor.listSelections();
 	selections.forEach(element => {
-		let selected = editor.getRange(element.anchor, element.head);
+		let anchorpos = element.anchor.line + element.anchor.ch;
+		let headpos = element.head.line + element.head.ch;
+		let start = anchorpos < headpos ? element.anchor : element.head;
+		let end =  anchorpos < headpos ? element.head : element.anchor;
+
+		let selected = editor.getRange(start, end);
 		let coloredText = `${prefix}${selected}${suffix}`;
 
-		editor.replaceRange(coloredText, element.anchor, element.head);
+		
+
+
+		editor.replaceRange(coloredText, start, end);
 
 		// move cursor one item to the right.
 		// could not find a way to query for last possible position, so trycatch is needed.

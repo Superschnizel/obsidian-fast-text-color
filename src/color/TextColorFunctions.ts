@@ -127,11 +127,8 @@ export function removeColor(editor: Editor, view: EditorView) {
 				return true;
 			}
 
-
 			const TcLeft = n.node.getChild("TcLeft");
 			const Rmarker = n.node.getChild("TcRight")?.getChild("REnd")?.getChild("RMarker");
-			console.log("found a node");
-
 
 			changes.push({
 				from: TcLeft ? TcLeft.from : 0,

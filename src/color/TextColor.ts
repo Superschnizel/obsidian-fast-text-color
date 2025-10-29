@@ -22,7 +22,7 @@ export class TextColor {
 	/**
 	 * Create a basic Text Color
 	 *
-	 * @param {string} color - [TODO:description]
+	 * @param {string} color - the color of the text
 	 * @param {string} id - the id or name of the color
 	 * @param {string} themeName - the associated theme that this color belongs to
 	 * @param {boolean} [italic] - italic text

@@ -41,7 +41,7 @@ export default class FastTextColorPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		this.styleElements = new Map<Window, HTMLElement | null>();
+		this.styleElements = new Map < Window, HTMLElement | null > ();
 
 		// setup Editor Extensions
 		this.registerEditorExtension(textColorParserField);
@@ -113,6 +113,16 @@ export default class FastTextColorPlugin extends Plugin {
 							(subitem.iconEl as HTMLElement).addClass(tColor.className);
 						})
 					});
+					submenu.addItem((subitem) => {
+						subitem
+							.setTitle("remove")
+							.setIcon("ban")
+							.onClick(evt => {
+								// @ts-expect-error, not typed
+								const editorView = view.editor.cm as EditorView;
+								removeColor(editor, editorView);
+							});
+					})
 				})
 			})
 		);
@@ -124,7 +134,7 @@ export default class FastTextColorPlugin extends Plugin {
 			this.styleElements.set(window, null);
 			this.setCssVariables();
 		});
-		this.app.workspace.on("window-close", (_, window) => { this.styleElements.delete(window)});
+		this.app.workspace.on("window-close", (_, window) => { this.styleElements.delete(window) });
 
 		this.styleElements.set(activeWindow, null);
 

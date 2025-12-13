@@ -2,7 +2,7 @@ import esbuild from "esbuild";
 import process from "process";
 import builtins from "builtin-modules";
 import fs from "fs";
-import sass from "node-sass";
+import * as sass from 'sass'
 
 const banner =
 	`/*

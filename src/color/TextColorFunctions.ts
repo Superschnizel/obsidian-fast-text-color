@@ -43,23 +43,18 @@ export function applyColor(tColor: TextColor, editor: Editor) {
 		let start =  anchorOffset < headOffset ? element.anchor : element.head;
 		let end = anchorOffset < headOffset ? element.head : element.anchor;
 
-		let selected = editor.getRange(start, end);
-		let coloredText = `${prefix}${selected}${suffix}`;
-
-
-
-
-		editor.replaceRange(coloredText, start, end);
-
-		// move cursor one item to the right.
-		// could not find a way to query for last possible position, so trycatch is needed.
-		try {
-			let pos = editor.getCursor();
-			pos.ch = pos.ch + 1;
-			editor.setCursor(pos);
-		} catch {
-			return;
+		const selected = editor.getRange(start, end);
+		let selectedLines = selected.split('\n');
+		for (let i=0; i < selectedLines.length; i++) {
+			if (selectedLines[i]) selectedLines[i] = prefix + selectedLines[i] + suffix; 
 		}
+		const coloredLines = selectedLines.join('\n');
+		editor.replaceRange(coloredLines, start, end);
+
+		start.ch += prefix.length;
+		end.ch += prefix.length;
+
+		editor.setSelection(start,end);
 	});
 
 	// TODO check if there already is some coloring applied somewhere near.

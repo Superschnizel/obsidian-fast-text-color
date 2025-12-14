@@ -51,10 +51,19 @@ export function applyColor(tColor: TextColor, editor: Editor) {
 		const coloredLines = selectedLines.join('\n');
 		editor.replaceRange(coloredLines, start, end);
 
-		start.ch += prefix.length;
-		end.ch += prefix.length;
-
-		editor.setSelection(start,end);
+		// Set selection to be the text within the exterior fences
+		// Ignore empty lines at the beginning and end
+		// If all lines are empty, put cursor at the end of selection
+		const nonEmpty = (element) => element.length > 0;
+		if (!selectedLines.some(nonEmpty))
+			editor.setCursor(end);
+		else {
+			const firstNonEmptyLine = selectedLines.findIndex(nonEmpty);
+			const lastNonEmptyLine = selectedLines.findLastIndex(nonEmpty);
+			const beginSelection = {line: start.line + firstNonEmptyLine, ch:(firstNonEmptyLine == 0) ? start.ch + prefix.length : prefix.length};
+			const endSelection = {line: start.line + lastNonEmptyLine, ch:(lastNonEmptyLine == selectedLines.length) ? end.ch + prefix.length : selectedLines[lastNonEmptyLine].length - suffix.length};
+			editor.setSelection(beginSelection, endSelection);
+		}
 	});
 
 	// TODO check if there already is some coloring applied somewhere near.

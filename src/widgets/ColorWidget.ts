@@ -1,4 +1,5 @@
 import { EditorView, WidgetType } from "@codemirror/view";
+import { LatestColor } from "../color/TextColor";
 import { CSS_COLOR_PREFIX, getColors, VAR_COLOR_PREFIX } from "../FastTextColorSettings"
 import { Menu } from "obsidian";
 import { settingsFacet } from "src/SettingsFacet";
@@ -54,6 +55,7 @@ export class ColorWidget extends WidgetType {
 					item
 						.setTitle(tColor.id)
 						.onClick(evt => {
+							LatestColor.getInstance().setColor(tColor);
 							view.dispatch({
 								changes: {
 									from: this.from,

@@ -38,18 +38,19 @@ export function applyColor(tColor: TextColor, editor: Editor) {
 
 	let selections = editor.listSelections();
 	selections.forEach(element => {
+		// Compute start and end of selection from anchor and head
 		const anchorOffset = editor.posToOffset(element.anchor);
 		const headOffset = editor.posToOffset(element.head);
 		let start =  anchorOffset < headOffset ? element.anchor : element.head;
 		let end = anchorOffset < headOffset ? element.head : element.anchor;
 
+		// Add fences to all nonempty lines of the selection
 		const selected = editor.getRange(start, end);
 		let selectedLines = selected.split('\n');
 		for (let i=0; i < selectedLines.length; i++) {
 			if (selectedLines[i]) selectedLines[i] = prefix + selectedLines[i] + suffix; 
 		}
-		const coloredLines = selectedLines.join('\n');
-		editor.replaceRange(coloredLines, start, end);
+		editor.replaceRange(selectedLines.join('\n'), start, end);
 
 		// Set selection to be the text within the exterior fences
 		// Ignore empty lines at the beginning and end

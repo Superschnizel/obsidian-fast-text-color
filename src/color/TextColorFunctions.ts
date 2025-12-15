@@ -38,27 +38,32 @@ export function applyColor(tColor: TextColor, editor: Editor) {
 
 	let selections = editor.listSelections();
 	selections.forEach(element => {
+		// Compute start and end of selection from anchor and head
 		const anchorOffset = editor.posToOffset(element.anchor);
 		const headOffset = editor.posToOffset(element.head);
 		let start =  anchorOffset < headOffset ? element.anchor : element.head;
 		let end = anchorOffset < headOffset ? element.head : element.anchor;
 
-		let selected = editor.getRange(start, end);
-		let coloredText = `${prefix}${selected}${suffix}`;
+		// Add fences to all nonempty lines of the selection
+		const selected = editor.getRange(start, end);
+		let selectedLines = selected.split('\n');
+		for (let i=0; i < selectedLines.length; i++) {
+			if (selectedLines[i]) selectedLines[i] = prefix + selectedLines[i] + suffix; 
+		}
+		editor.replaceRange(selectedLines.join('\n'), start, end);
 
-
-
-
-		editor.replaceRange(coloredText, start, end);
-
-		// move cursor one item to the right.
-		// could not find a way to query for last possible position, so trycatch is needed.
-		try {
-			let pos = editor.getCursor();
-			pos.ch = pos.ch + 1;
-			editor.setCursor(pos);
-		} catch {
-			return;
+		// Set selection to be the text within the exterior fences
+		// Ignore empty lines at the beginning and end
+		// If all lines are empty, put cursor at the end of selection
+		const nonEmpty = (element) => element.length > 0;
+		if (!selectedLines.some(nonEmpty))
+			editor.setCursor(end);
+		else {
+			const firstNonEmptyLine = selectedLines.findIndex(nonEmpty);
+			const lastNonEmptyLine = selectedLines.findLastIndex(nonEmpty);
+			const beginSelection = {line: start.line + firstNonEmptyLine, ch:(firstNonEmptyLine == 0) ? start.ch + prefix.length : prefix.length};
+			const endSelection = {line: start.line + lastNonEmptyLine, ch:(lastNonEmptyLine == selectedLines.length-1) ? end.ch + prefix.length : selectedLines[lastNonEmptyLine].length - suffix.length};
+			editor.setSelection(beginSelection, endSelection);
 		}
 	});
 

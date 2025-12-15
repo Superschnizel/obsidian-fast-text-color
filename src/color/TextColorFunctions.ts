@@ -38,10 +38,10 @@ export function applyColor(tColor: TextColor, editor: Editor) {
 
 	let selections = editor.listSelections();
 	selections.forEach(element => {
-		let anchorpos = element.anchor.line + element.anchor.ch;
-		let headpos = element.head.line + element.head.ch;
-		let start = anchorpos < headpos ? element.anchor : element.head;
-		let end = anchorpos < headpos ? element.head : element.anchor;
+		const anchorOffset = editor.posToOffset(element.anchor);
+		const headOffset = editor.posToOffset(element.head);
+		let start =  anchorOffset < headOffset ? element.anchor : element.head;
+		let end = anchorOffset < headOffset ? element.head : element.anchor;
 
 		let selected = editor.getRange(start, end);
 		let coloredText = `${prefix}${selected}${suffix}`;

@@ -62,7 +62,7 @@ export function applyColor(tColor: TextColor, editor: Editor) {
 			const firstNonEmptyLine = selectedLines.findIndex(nonEmpty);
 			const lastNonEmptyLine = selectedLines.findLastIndex(nonEmpty);
 			const beginSelection = {line: start.line + firstNonEmptyLine, ch:(firstNonEmptyLine == 0) ? start.ch + prefix.length : prefix.length};
-			const endSelection = {line: start.line + lastNonEmptyLine, ch:(lastNonEmptyLine == selectedLines.length) ? end.ch + prefix.length : selectedLines[lastNonEmptyLine].length - suffix.length};
+			const endSelection = {line: start.line + lastNonEmptyLine, ch:(lastNonEmptyLine == selectedLines.length-1) ? end.ch + prefix.length : selectedLines[lastNonEmptyLine].length - suffix.length};
 			editor.setSelection(beginSelection, endSelection);
 		}
 	});

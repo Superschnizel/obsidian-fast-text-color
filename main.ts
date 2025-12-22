@@ -55,8 +55,7 @@ export default class FastTextColorPlugin extends Plugin {
 		this.registerEditorExtension(this.settingsExtension);
 
 		// initialize LatestColor
-		let lColor = LatestColor.getInstance();
-		lColor.setColor(getColors(this.settings)[0]);
+		LatestColor.getInstance().setColor(getColors(this.settings)[0]);
 
 		this.registerEditorExtension(
 			Prec.high(
@@ -81,7 +80,7 @@ export default class FastTextColorPlugin extends Plugin {
 			id: 'text-color-latestcolor',
 			name: 'Apply latest color',
 			editorCallback: (editor: Editor) => {
-				applyColor(lColor.getColor(), editor);
+				applyColor(LatestColor.getInstance().getColor(), editor);
 			}
 		});
 

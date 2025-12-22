@@ -1,4 +1,4 @@
-import { TextColor } from "./TextColor";
+import { TextColor, LatestColor } from "./TextColor";
 import { Editor } from "obsidian";
 import { EditorView } from "@codemirror/view";
 import { textColorParserField } from "../rendering/TextColorStateField";
@@ -14,6 +14,9 @@ export function applyColor(tColor: TextColor, editor: Editor) {
 
 	let prefix = `~={${tColor.id}}`;
 	let suffix = `=~`;
+
+	// Update latest color
+	LatestColor.getInstance().setColor(tColor);
 
 	// nothing is selected, just insert coloring
 	if (!editor.somethingSelected()) {

@@ -10,7 +10,7 @@ import {
 	WorkspaceWindow,
 } from 'obsidian';
 import { DEFAULT_SETTINGS, FastTextColorPluginSettingTab, FastTextColorPluginSettings, getColors, SETTINGS_VERSION, updateSettings, CSS_COLOR_PREFIX, getCurrentTheme } from 'src/FastTextColorSettings';
-import { TextColor } from 'src/color/TextColor';
+import { TextColor, LatestColor } from 'src/color/TextColor';
 import { PREFIX, SUFFIX } from 'src/utils/regularExpressions';
 import { textColorViewPlugin } from 'src/rendering/TextColorViewPlugin'
 import { textColorParserField } from 'src/rendering/TextColorStateField';
@@ -54,6 +54,9 @@ export default class FastTextColorPlugin extends Plugin {
 		this.settingsExtension = this.settingsCompartment.of(settingsFacet.of(this.settings));
 		this.registerEditorExtension(this.settingsExtension);
 
+		// initialize LatestColor
+		LatestColor.getInstance().setColor(getColors(this.settings)[0]);
+
 		this.registerEditorExtension(
 			Prec.high(
 				keymap.of([
@@ -70,6 +73,14 @@ export default class FastTextColorPlugin extends Plugin {
 			name: 'Change text color',
 			editorCallback: (editor: Editor) => { // for this to work, needs to be in editor mode
 				this.openColorMenu(editor);
+			}
+		});
+
+		this.addCommand({
+			id: 'text-color-latestcolor',
+			name: 'Apply latest color',
+			editorCallback: (editor: Editor) => {
+				applyColor(LatestColor.getInstance().getColor(), editor);
 			}
 		});
 

@@ -119,3 +119,25 @@ export class CycleState {
 		this.state = this.states[this.index];
 	}
 }
+
+
+// Singleton class to store latest color
+export class LatestColor {
+	private static_instance: LatestColor;
+	private color : TextColor = new TextColor();
+
+	private constructor() {}
+
+	public static getInstance()
+	{
+		return this._instance || (this._instance = new this());
+	}
+
+	public getColor (): TextColor {
+		return this.color;
+	}
+
+	public setColor(tColor : TextColor): void {
+		this.color = tColor;
+	}
+}

@@ -64,7 +64,7 @@ export class TextColor {
 		return this.useCssColorVariable ? `var(${this.colorVariable})` : this.color;
 	}
 
-	getCssDeclarations(settings?: FastTextColorPluginSettings) : string[] {
+	getCssDeclarations(settings?: FastTextColorPluginSettings): string[] {
 		return [
 			`--ftc-color: ${this.getColorValue()};`,
 			"color: var(--ftc-color);",
@@ -79,8 +79,8 @@ export class TextColor {
 
 	getCssClass(settings?: FastTextColorPluginSettings): string {
 		return `.${CSS_COLOR_PREFIX}${this.id} {\n  ` +
-				this.getCssDeclarations(settings).join("\n  ") + "\n  " +
-				`${VAR_COLOR_PREFIX}${this.id}: ${this.color};\n}`;
+			this.getCssDeclarations(settings).join("\n  ") + "\n  " +
+			`${VAR_COLOR_PREFIX}${this.id}: ${this.color};\n}`;
 	}
 
 	/**
@@ -123,21 +123,20 @@ export class CycleState {
 
 // Singleton class to store latest color
 export class LatestColor {
-	private static_instance: LatestColor;
-	private color : TextColor = new TextColor();
+	private static static_instance: LatestColor;
+	private color: TextColor = new TextColor("", "", "");
 
-	private constructor() {}
+	private constructor() { }
 
-	public static getInstance()
-	{
-		return this._instance || (this._instance = new this());
+	public static getInstance() {
+		return this.static_instance || (this.static_instance = new this());
 	}
 
-	public getColor (): TextColor {
+	public getColor(): TextColor {
 		return this.color;
 	}
 
-	public setColor(tColor : TextColor): void {
+	public setColor(tColor: TextColor): void {
 		this.color = tColor;
 	}
 }

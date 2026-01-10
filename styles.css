@@ -17,27 +17,30 @@ The general structure of the menu is adapted from Chetachi's cMenu https://githu
   z-index: var(--layer-status-bar);
   /* box-shadow: 0px 3px 32px rgb(31 38 135 / 15%); */
   border: 1px solid var(--background-modifier-border);
-  background-color: var(--background-primary); }
-  #fast-color-menu .fast-color-menu-item {
-    width: var(--size-4-8);
-    height: var(--size-4-8);
-    color: white;
-    margin: 2px;
-    border: none;
-    display: flex;
-    cursor: pointer;
-    padding: 5px 6px;
-    box-shadow: none;
-    margin-left: 3px;
-    margin-right: 3px;
-    position: relative;
-    border-radius: 3px;
-    font-size: initial !important;
-    background-color: var(--background-primary-alt);
-    text-shadow: 0 0 2px #000; }
+  background-color: var(--background-primary);
+}
+#fast-color-menu .fast-color-menu-item {
+  width: var(--size-4-8);
+  height: var(--size-4-8);
+  color: white;
+  margin: 2px;
+  border: none;
+  display: flex;
+  cursor: pointer;
+  padding: 5px 6px;
+  box-shadow: none;
+  margin-left: 3px;
+  margin-right: 3px;
+  position: relative;
+  border-radius: 3px;
+  font-size: initial !important;
+  background-color: var(--background-primary-alt);
+  text-shadow: 0 0 2px #000;
+}
 
 .fast-color-menu-item.number-icon {
-  color: white; }
+  color: white;
+}
 
 .menu.fast-color-menu {
   /* min-width: 140px; */
@@ -57,23 +60,27 @@ The general structure of the menu is adapted from Chetachi's cMenu https://githu
   animation: fade 300ms ease-in-out;
   background-color: var(--background-primary-alt);
   box-shadow: 0px 3px 25px rgba(31, 38, 135, 0.1);
-  border: 1px solid var(--background-modifier-border); }
-  .menu.fast-color-menu .menu-item {
-    display: flex;
-    align-items: center;
-    padding: var(--size-4-2);
-    cursor: pointer;
-    font-size: 14px;
-    height: fit-content; }
-    .menu.fast-color-menu .menu-item .menu-item-icon {
-      display: inline-block;
-      width: var(--size-4-5);
-      height: var(--size-4-5);
-      background-color: aqua;
-      border-radius: var(--radius-s);
-      border: var(--border-width) solid var(--background-modifier-border); }
-    .menu.fast-color-menu .menu-item:last-of-type {
-      border-bottom: none; }
+  border: 1px solid var(--background-modifier-border);
+}
+.menu.fast-color-menu .menu-item .menu-item-icon {
+  display: inline-block;
+  width: var(--size-4-5);
+  height: var(--size-4-5);
+  background-color: aqua;
+  border-radius: var(--radius-s);
+  border: var(--border-width) solid var(--background-modifier-border);
+}
+.menu.fast-color-menu .menu-item {
+  display: flex;
+  align-items: center;
+  padding: var(--size-4-2);
+  cursor: pointer;
+  font-size: 14px;
+  height: fit-content;
+}
+.menu.fast-color-menu .menu-item:last-of-type {
+  border-bottom: none;
+}
 
 /* SETTINGS  */
 .ftc-settings-theme-header {
@@ -81,7 +88,8 @@ The general structure of the menu is adapted from Chetachi's cMenu https://githu
   border: 2px solid var(--background-modifier-border);
   border-bottom: none;
   padding-left: var(--size-4-2);
-  padding-right: var(--size-4-2); }
+  padding-right: var(--size-4-2);
+}
 
 .ftc-theme-colors {
   display: flex;
@@ -93,74 +101,91 @@ The general structure of the menu is adapted from Chetachi's cMenu https://githu
   padding-bottom: var(--size-4-4);
   border-left: 2px solid var(--background-modifier-border);
   border-right: 2px solid var(--background-modifier-border);
-  justify-content: space-between; }
+  justify-content: space-between;
+}
 
 .ftc-settings-theme-footer {
   border-radius: 0 0 var(--radius-l) var(--radius-l);
   border: 2px solid var(--background-modifier-border);
   border-top: none;
   padding-left: var(--size-4-2);
-  padding-right: var(--size-4-2); }
+  padding-right: var(--size-4-2);
+}
 
 .ftc-settings-item {
   padding: var(--size-4-2) !important;
   background-color: var(--background-primary);
   border-radius: var(--radius-m);
   border: 1px solid var(--background-modifier-border) !important;
-  margin-top: var(--size-4-2); }
+  margin-top: var(--size-4-2);
+}
 
 .ftc-format-item {
   width: var(--size-4-6);
   height: var(--size-4-6);
-  background-color: var(--interactive-normal); }
+  background-color: var(--interactive-normal);
+}
 
 .ftc-format-item-enabled {
   /* width: var(--size-4-6); */
   /* height: var(--size-4-6); */
-  background-color: var(--interactive-accent) !important; }
+  background-color: var(--interactive-accent) !important;
+}
 
 .ftc-uppercase {
-  text-transform: uppercase; }
+  text-transform: uppercase;
+}
 
 .ftc-small-caps {
-  font-variant: small-caps; }
+  font-variant: small-caps;
+}
 
 .ftc-keybind-button {
   width: var(--size-4-8);
-  height: var(--size-4-8); }
+  height: var(--size-4-8);
+}
 
 .ftc-format-left {
-  border-radius: var(--radius-s) 0 0 var(--radius-s); }
+  border-radius: var(--radius-s) 0 0 var(--radius-s);
+}
 
 .ftc-format-middle {
   border-radius: 0 0 0 0;
-  margin-left: calc(0px - var(--size-4-2)); }
+  margin-left: calc(0px - var(--size-4-2));
+}
 
 .ftc-format-right {
   border-radius: 0 var(--radius-s) var(--radius-s) 0;
-  margin-left: calc(0px - var(--size-4-2)); }
+  margin-left: calc(0px - var(--size-4-2));
+}
 
 .ftc-format-item-small {
   width: var(--size-4-4);
   height: var(--size-4-4);
   padding: 0;
   /* background-color: var(--interactive-normal); */
-  background-color: red; }
+  background-color: red;
+}
 
 .ftc-format-bold {
-  font-weight: bold; }
+  font-weight: bold;
+}
 
 .ftc-format-italic {
-  font-style: italic; }
+  font-style: italic;
+}
 
 .ftc-format-underline {
-  text-decoration: underline; }
+  text-decoration: underline;
+}
 
 .ftc-format-overline {
-  text-decoration: overline; }
+  text-decoration: overline;
+}
 
 .ftc-format-line-through {
-  text-decoration: line-through; }
+  text-decoration: line-through;
+}
 
 .key-indicator {
   display: flex;
@@ -169,49 +194,58 @@ The general structure of the menu is adapted from Chetachi's cMenu https://githu
   align-items: center;
   justify-content: center;
   border: 2px solid var(--background-modifier-border);
-  border-radius: 0.3em; }
+  border-radius: 0.3em;
+}
 
 .ftc-name-div {
   display: flex;
   width: 100%;
   justify-content: space-between;
   align-items: center;
-  flex-direction: row; }
+  flex-direction: row;
+}
 
 .ftc-move-btn-left {
   width: var(--size-4-6);
   height: var(--size-4-6);
   border-radius: var(--radius-s) 0 0 var(--radius-s);
-  padding: 0px; }
+  padding: 0px;
+}
 
 .ftc-move-btn-right {
   width: var(--size-4-6);
   height: var(--size-4-6);
   border-radius: 0 var(--radius-s) var(--radius-s) 0;
   padding: 0px;
-  margin-left: calc(0px - var(--size-4-2)); }
+  margin-left: calc(0px - var(--size-4-2));
+}
 
 .ftc-theme-name-error {
   height: var(--size-4-4);
   width: 100%;
   text-align: right;
   color: red;
-  font-size: var(--font-ui-smaller); }
+  font-size: var(--font-ui-smaller);
+}
 
 /* color delimiter icon */
 .ftc-color-delimiter {
   cursor: pointer;
   padding-left: 2px;
-  padding-right: 2px; }
+  padding-right: 2px;
+}
 
 /* https://github.com/animate-css/animate.css/blob/main/source/fading_entrances/fadeInLeft.css */
 @keyframes fadeInLeft {
   from {
     opacity: 0;
-    transform: translate3d(-100%, 0, 0); }
+    transform: translate3d(-100%, 0, 0);
+  }
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0); } }
-
+    transform: translate3d(0, 0, 0);
+  }
+}
 .fadeInLeft {
-  animation-name: fadeInLeft; }
+  animation-name: fadeInLeft;
+}

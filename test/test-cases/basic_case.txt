@@ -1,1 +1,1 @@
-++{colordescription} this text is colored++
+++{colordescription} this text is highlighted++

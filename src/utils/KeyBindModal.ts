@@ -6,8 +6,6 @@ class KeyBindModal extends Modal {
 	finished: boolean;
 	handler: any;
 
-
-
 	constructor(app: App) {
 		super(app);
 
@@ -19,21 +17,18 @@ class KeyBindModal extends Modal {
 
 		contentEl.createEl("h1", { text: "Press any key" });
 		// let center = contentEl.createDiv();
-		// center.addClass("ftc-keypress-modal")
-		// center.createDiv().addClass("ftc-keypress-modal-center")
+		// center.addClass("fth-keypress-modal")
+		// center.createDiv().addClass("fth-keypress-modal-center")
 
 		this.handler = this.handleKeypress.bind(this);
 
-		window.addEventListener('keypress', this.handler);
+		window.addEventListener("keypress", this.handler);
 
-		new Setting(contentEl)
-			.addButton(btn => {
-				btn
-					.setButtonText("Cancel")
-					.onClick(evt => {
-						this.close()
-					})
-			})
+		new Setting(contentEl).addButton((btn) => {
+			btn.setButtonText("Cancel").onClick((evt) => {
+				this.close();
+			});
+		});
 	}
 
 	onClose() {
@@ -44,12 +39,11 @@ class KeyBindModal extends Modal {
 	handleKeypress(evt: KeyboardEvent) {
 		this.result = evt.key.toUpperCase();
 
-		// console.log("Keypressed");
+		// console.debug("Keypressed");
 
+		this.modalEl.removeEventListener("keypress", this.handler, true);
 
-		this.modalEl.removeEventListener('keypress', this.handler, true);
-
-		// console.log("removed");
+		// console.debug("removed");
 
 		this.finished = true;
 	}

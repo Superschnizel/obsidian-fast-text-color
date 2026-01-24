@@ -1,18 +1,27 @@
-import { MarkdownPostProcessorContext } from 'obsidian'
+import { MarkdownPostProcessorContext } from "obsidian";
 import { Tree } from "@lezer/common";
-import { CSS_COLOR_PREFIX, FastTextColorPluginSettings, getCurrentTheme } from 'src/FastTextColorSettings';
-import { PREFIX, SUFFIX, RegExMatch } from 'src/utils/regularExpressions';
-import { match } from 'assert';
-import { Console } from 'console';
+import {
+	CSS_COLOR_PREFIX,
+	FastTextColorPluginSettings,
+	getCurrentTheme,
+} from "src/FastTextColorSettings";
+import { PREFIX, SUFFIX, RegExMatch } from "src/utils/regularExpressions";
+import { match } from "assert";
+import { Console } from "console";
 
-export const textColorPostProcessor = (el: HTMLElement, context: MarkdownPostProcessorContext, settings: FastTextColorPluginSettings) => {
-
+export const textColorPostProcessor = (
+	el: HTMLElement,
+	context: MarkdownPostProcessorContext,
+	settings: FastTextColorPluginSettings,
+) => {
 	if (!el.innerHTML.match(PREFIX)) {
 		return;
 	}
 
 	// get theme name from frontmatter or from settings
-	let themeName = context.frontmatter ? context.frontmatter["ftcTheme"] : null;
+	let themeName = context.frontmatter
+		? context.frontmatter["ftcTheme"]
+		: null;
 	themeName = themeName ? themeName : getCurrentTheme(settings).name;
 
 	const emergencyCopy = el.cloneNode(true);
@@ -20,19 +29,18 @@ export const textColorPostProcessor = (el: HTMLElement, context: MarkdownPostPro
 	try {
 		rebuildNode(el, themeName);
 	} catch (e) {
-		console.error(`fatal in rebuildNode: ${e}`)
+		console.error(`fatal in rebuildNode: ${e}`);
 		// readd from emergency Copy. should be removed as soon as node rebuilding is stable.
-		el.childNodes.forEach(c => {
+		el.childNodes.forEach((c) => {
 			c.parentNode?.removeChild(c);
-		})
+		});
 
-		emergencyCopy.childNodes.forEach(c => {
+		emergencyCopy.childNodes.forEach((c) => {
 			el.appendChild(c);
-		})
+		});
 	}
 	return;
-}
-
+};
 
 /**
  * Rebuilds the Node Tree and adds color nodes where necessary.
@@ -44,32 +52,39 @@ export const textColorPostProcessor = (el: HTMLElement, context: MarkdownPostPro
  * @param {Node[]} [nodeStack] - a stack to keep track of added color nodes.
  * @returns {Node} the rebuilt node.
  */
-function rebuildNode(node: Node, themeName: string, level: number = 0, nodeStack: Node[] = []): Node {
-	if (node.nodeName == 'CODE') {
+function rebuildNode(
+	node: Node,
+	themeName: string,
+	level: number = 0,
+	nodeStack: Node[] = [],
+): Node {
+	if (node.nodeName == "CODE") {
 		return node;
 	}
 
 	if (level > 1000) {
 		console.error("fatal: reached depth 1000 in recursion");
-
 	}
 
 	// keep track of last length of live nodeList to handle items moved out of list.
 	let lastLength = node.childNodes.length;
 
 	for (let i = 0; i < node.childNodes.length; i++) {
-
 		lastLength = node.childNodes.length;
 
-
 		let childNode: Node = node.childNodes.item(i);
-
 
 		const text = childNode.nodeValue;
 
 		// the last item on the stack should always be the current parent.
-		if ((nodeStack.last() != undefined) && (nodeStack.last() != childNode) && !(childNode.compareDocumentPosition(nodeStack.last()!) & Node.DOCUMENT_POSITION_CONTAINS)) {
-
+		if (
+			nodeStack.last() != undefined &&
+			nodeStack.last() != childNode &&
+			!(
+				childNode.compareDocumentPosition(nodeStack.last()!) &
+				Node.DOCUMENT_POSITION_CONTAINS
+			)
+		) {
 			childNode.parentNode?.removeChild(childNode);
 			nodeStack.last()?.appendChild(childNode);
 
@@ -79,7 +94,7 @@ function rebuildNode(node: Node, themeName: string, level: number = 0, nodeStack
 			}
 		}
 
-		// console.log(`node: ${childNode.nodeName}, level: ${level}`);
+		// console.debug(`node: ${childNode.nodeName}, level: ${level}`);
 		if (childNode.nodeType != Node.TEXT_NODE) {
 			// if childnode is not textnode, handle recursively.
 			childNode = rebuildNode(childNode, themeName, level + 1, nodeStack);
@@ -88,7 +103,7 @@ function rebuildNode(node: Node, themeName: string, level: number = 0, nodeStack
 			continue;
 		}
 
-		// console.log(`node: ${childNode.nodeName}\n  text: ${text}\n  index: ${i}\n  childNode.length: ${node.childNodes.length}\n  lastLength: ${lastLength}`);
+		// console.debug(`node: ${childNode.nodeName}\n  text: ${text}\n  index: ${i}\n  childNode.length: ${node.childNodes.length}\n  lastLength: ${lastLength}`);
 
 		if (text == null || text == "") {
 			continue;
@@ -103,12 +118,17 @@ function rebuildNode(node: Node, themeName: string, level: number = 0, nodeStack
 			continue;
 		}
 
-		let nextPrefixPosition = prefix != null ? prefix.index : Number.POSITIVE_INFINITY;
-		let nextSuffixPosition = suffix != null ? suffix.index : Number.POSITIVE_INFINITY;
+		let nextPrefixPosition =
+			prefix != null ? prefix.index : Number.POSITIVE_INFINITY;
+		let nextSuffixPosition =
+			suffix != null ? suffix.index : Number.POSITIVE_INFINITY;
 
 		if (nextPrefixPosition == nextSuffixPosition) {
 			// should never be the case but idk.
-			console.error("fatal: nextPrefixPosition and nextSuffixPosition are the same but not infinity!!: " + `${nextPrefixPosition}`);
+			console.error(
+				"fatal: nextPrefixPosition and nextSuffixPosition are the same but not infinity!!: " +
+					`${nextPrefixPosition}`,
+			);
 
 			return node;
 		}
@@ -122,13 +142,24 @@ function rebuildNode(node: Node, themeName: string, level: number = 0, nodeStack
 			let prefixContent = prefix.value;
 			let color = prefixContent.slice(3, prefixContent.length - 1);
 
-			// console.log(`handling prefix:\nprevText: ${textBeforeDelim}\nnextText: ${textAfterDelim}`)
+			// console.debug(`handling prefix:\nprevText: ${textBeforeDelim}\nnextText: ${textAfterDelim}`)
 
 			// create the color element
 			let colorSpan = document.createElement("span");
 			colorSpan.addClass(`${CSS_COLOR_PREFIX}${themeName}-${color}`);
+			// Set the text color style directly from settings
+			try {
+				// Find the color object from settings
+				const theme = settings.themes.find((t) => t.name === themeName);
+				const tColor = theme?.colors.find((c) => c.id === color);
+				if (tColor && tColor.textColor) {
+					colorSpan.style.color = tColor.textColor;
+				}
+			} catch (e) {
+				// fallback: do nothing
+			}
 
-			// set text in last node and create color node and insert it after the last node. 
+			// set text in last node and create color node and insert it after the last node.
 			childNode.nodeValue = textBeforeDelim;
 			childNode.parentNode?.insertAfter(colorSpan, childNode);
 
@@ -146,7 +177,7 @@ function rebuildNode(node: Node, themeName: string, level: number = 0, nodeStack
 		let textBeforeDelim = text.slice(0, nextSuffixPosition);
 		let textAfterDelim = text.slice(suffix!.end);
 
-		// console.log(`handling suffix:\nprevText: ${textBeforeDelim}\nnextText: ${textAfterDelim}`);
+		// console.debug(`handling suffix:\nprevText: ${textBeforeDelim}\nnextText: ${textAfterDelim}`);
 
 		childNode.nodeValue = textBeforeDelim;
 
@@ -156,7 +187,6 @@ function rebuildNode(node: Node, themeName: string, level: number = 0, nodeStack
 		prevNode.parentNode?.insertAfter(newNode, prevNode);
 
 		continue;
-
 	}
 	return node;
 }
@@ -170,8 +200,8 @@ function rebuildNode(node: Node, themeName: string, level: number = 0, nodeStack
  * @returns {string} the pretty printed dom Structure
  */
 function prettyPrintDOMStructure(node: Node, depth: number = 0): string {
-	const indent = '  '.repeat(depth);
-	let output = '';
+	const indent = "  ".repeat(depth);
+	let output = "";
 
 	switch (node.nodeType) {
 		case Node.ELEMENT_NODE:
@@ -182,19 +212,19 @@ function prettyPrintDOMStructure(node: Node, depth: number = 0): string {
 				output += `#${element.id}`;
 			}
 
-			if (element.className && typeof element.className === 'string') {
-				output += `.${element.className.split(' ').join('.')}`;
+			if (element.className && typeof element.className === "string") {
+				output += `.${element.className.split(" ").join(".")}`;
 			}
 
-			output += '\n';
+			output += "\n";
 
-			Array.from(element.attributes).forEach(attr => {
-				if (attr.name !== 'id' && attr.name !== 'class') {
+			Array.from(element.attributes).forEach((attr) => {
+				if (attr.name !== "id" && attr.name !== "class") {
 					output += `${indent}  ${attr.name}="${attr.value}"\n`;
 				}
 			});
 
-			element.childNodes.forEach(childNode => {
+			element.childNodes.forEach((childNode) => {
 				output += prettyPrintDOMStructure(childNode, depth + 1);
 			});
 			break;
@@ -221,7 +251,7 @@ function GetAllMatches(text: string, regex: RegExp): RegExMatch[] {
 	// so in the end i guess it does have to be global.
 	// Regex being statefull is just so annoying...
 	// im starting to get why some people hate on OOP
-	const regexCopy = new RegExp(regex.source, 'g');
+	const regexCopy = new RegExp(regex.source, "g");
 	const matches: RegExMatch[] = [];
 
 	// let m = regexCopy.exec(text);
@@ -231,7 +261,7 @@ function GetAllMatches(text: string, regex: RegExp): RegExMatch[] {
 		matches.push({
 			index: m.index,
 			value: m[0],
-			end: m.index + m[0].length
+			end: m.index + m[0].length,
 		});
 	}
 
@@ -246,7 +276,7 @@ function GetAllMatches(text: string, regex: RegExp): RegExMatch[] {
  * @returns {RegExMatch | null} the first match or null
  */
 function GetFirstMatch(text: string, regex: RegExp): RegExMatch | null {
-	const regexCopy = new RegExp(regex.source, 'g');
+	const regexCopy = new RegExp(regex.source, "g");
 	const matches: RegExMatch[] = [];
 
 	let m = regexCopy.exec(text);
@@ -255,13 +285,12 @@ function GetFirstMatch(text: string, regex: RegExp): RegExMatch | null {
 		return {
 			index: m.index,
 			value: m[0],
-			end: m.index + m[0].length
+			end: m.index + m[0].length,
 		};
 	}
 
 	return null;
 }
-
 
 /**
  * DEPRECATED - leaving here because it might be needed at some point
@@ -271,13 +300,12 @@ function GetFirstMatch(text: string, regex: RegExp): RegExMatch | null {
  * @returns {[TODO:type]} [TODO:description]
  */
 function recurseReplace(node: Node, themeName: string) {
-
-	if (node.nodeName == 'CODE') {
+	if (node.nodeName == "CODE") {
 		return;
 	}
 
 	if (node.nodeType == Node.TEXT_NODE) {
-		// console.log(node.textContent);
+		// console.debug(node.textContent);
 		let text = node.nodeValue;
 
 		if (text == undefined) {
@@ -285,7 +313,9 @@ function recurseReplace(node: Node, themeName: string) {
 		}
 
 		// get Color
-		const colors = text.match(PREFIX)?.map(value => value.slice(3, value.length - 1));
+		const colors = text
+			.match(PREFIX)
+			?.map((value) => value.slice(3, value.length - 1));
 
 		let colorCount = 0;
 
@@ -301,7 +331,7 @@ function recurseReplace(node: Node, themeName: string) {
 		for (let i = 0; i < splitOnPrefix.length; i++) {
 			const textElement = splitOnPrefix[i];
 
-			if (textElement == '') {
+			if (textElement == "") {
 				continue;
 			}
 
@@ -314,19 +344,19 @@ function recurseReplace(node: Node, themeName: string) {
 					// is colored text.
 					const span = document.createSpan();
 
-					fragment.appendChild(span)
+					fragment.appendChild(span);
 					continue;
 				}
 
-				fragment.appendChild(document.createTextNode(element))
+				fragment.appendChild(document.createTextNode(element));
 			}
 		}
 
 		// node.nodeValue = text;
-		// console.log(node.nodeValue);
+		// console.debug(node.nodeValue);
 	}
 
-	node.childNodes.forEach(child => {
+	node.childNodes.forEach((child) => {
 		recurseReplace(child, themeName);
 	});
 }
@@ -346,7 +376,7 @@ function colorTextWithTree(tree: Tree, text: string): string {
 
 	tree.iterate({
 		enter(node) {
-			// console.log(node.name)
+			// console.debug(node.name)
 
 			switch (node.type.name) {
 				case "REnd":
@@ -360,7 +390,7 @@ function colorTextWithTree(tree: Tree, text: string): string {
 					return true;
 
 				case "Color":
-					// console.log('color')
+					// console.debug('color')
 					let color = text.slice(node.from, node.to);
 					stack.push(color);
 					return true;
@@ -372,12 +402,11 @@ function colorTextWithTree(tree: Tree, text: string): string {
 					return true;
 
 				default:
-					// console.log('default')
+					// console.debug('default')
 					break;
 			}
-
 		},
-	})
+	});
 
-	return ''
+	return "";
 }

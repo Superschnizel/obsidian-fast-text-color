@@ -1,4 +1,8 @@
-import { CSS_COLOR_PREFIX, VAR_COLOR_PREFIX, FastTextColorPluginSettings } from "../FastTextColorSettings";
+import {
+	CSS_COLOR_PREFIX,
+	VAR_COLOR_PREFIX,
+	FastTextColorPluginSettings,
+} from "../FastTextColorSettings";
 
 export class TextColor {
 	color: string;
@@ -12,12 +16,14 @@ export class TextColor {
 
 	keybind: string;
 
-
 	className: string;
 
 	// enables the use of theme colors.
 	useCssColorVariable: boolean;
 	colorVariable: string;
+
+	// new: text color for highlighted text
+	textColor: string;
 
 	/**
 	 * Create a basic Text Color
@@ -40,9 +46,10 @@ export class TextColor {
 		bold: boolean = false,
 		cap_mode_index: number = 0,
 		line_mode_index: number = 0,
-		keybind: string = '',
+		keybind: string = "",
 		useCssColorVariable: boolean = false,
-		colorVariable: string = "--color-base-00"
+		colorVariable: string = "--color-base-00",
+		textColor: string = "inherit",
 	) {
 		this.color = color;
 		this.id = id;
@@ -51,36 +58,56 @@ export class TextColor {
 		// text style
 		this.italic = italic;
 		this.bold = bold;
-		this.cap_mode = new CycleState(['normal', 'all_caps', 'small_caps'], cap_mode_index);
-		this.line_mode = new CycleState(['none', 'underline', 'overline', 'line-through'], line_mode_index);
+		this.cap_mode = new CycleState(
+			["normal", "all_caps", "small_caps"],
+			cap_mode_index,
+		);
+		this.line_mode = new CycleState(
+			["none", "underline", "overline", "line-through"],
+			line_mode_index,
+		);
 
 		this.useCssColorVariable = useCssColorVariable;
 		this.colorVariable = colorVariable;
 
-		this.className = `${CSS_COLOR_PREFIX}${themeName}-${this.id}`
+		this.className = `${CSS_COLOR_PREFIX}${themeName}-${this.id}`;
+		this.textColor = textColor;
 	}
 
 	getColorValue(): string {
-		return this.useCssColorVariable ? `var(${this.colorVariable})` : this.color;
+		return this.useCssColorVariable
+			? `var(${this.colorVariable})`
+			: this.color;
 	}
 
 	getCssDeclarations(settings?: FastTextColorPluginSettings): string[] {
 		return [
-			`--ftc-color: ${this.getColorValue()};`,
-			"color: var(--ftc-color);",
-			this.italic ? "font-style: italic;" : '',
-			this.bold ? "font-weight: bold;" : '',
-			this.line_mode.state != "none" ? `text-decoration: ${this.line_mode.state};` : '',
-			this.cap_mode.state == "all_caps" ? "text-transform: uppercase;" :
-				this.cap_mode.state == "small_caps" ? "font-variant: small-caps;" : '',
-			settings?.colorCodeSection ? "--code-normal: var(--ftc-color);" : '',
+			`--fth-color: ${this.getColorValue()};`,
+			`background-color: var(--fth-color);`,
+			`color: ${this.textColor};`,
+			this.italic ? "font-style: italic;" : "",
+			this.bold ? "font-weight: bold;" : "",
+			this.line_mode.state != "none"
+				? `text-decoration: ${this.line_mode.state};`
+				: "",
+			this.cap_mode.state == "all_caps"
+				? "text-transform: uppercase;"
+				: this.cap_mode.state == "small_caps"
+					? "font-variant: small-caps;"
+					: "",
+			settings?.colorCodeSection
+				? "--code-normal: var(--fth-color);"
+				: "",
 		].filter(Boolean);
 	}
 
 	getCssClass(settings?: FastTextColorPluginSettings): string {
-		return `.${CSS_COLOR_PREFIX}${this.id} {\n  ` +
-			this.getCssDeclarations(settings).join("\n  ") + "\n  " +
-			`${VAR_COLOR_PREFIX}${this.id}: ${this.color};\n}`;
+		return (
+			`.${CSS_COLOR_PREFIX}${this.id} {\n  ` +
+			this.getCssDeclarations(settings).join("\n  ") +
+			"\n  " +
+			`${VAR_COLOR_PREFIX}${this.id}: ${this.color};\n}`
+		);
 	}
 
 	/**
@@ -120,13 +147,12 @@ export class CycleState {
 	}
 }
 
-
 // Singleton class to store latest color
 export class LatestColor {
 	private static static_instance: LatestColor;
 	private color: TextColor = new TextColor("", "", "");
 
-	private constructor() { }
+	private constructor() {}
 
 	public static getInstance() {
 		return this.static_instance || (this.static_instance = new this());

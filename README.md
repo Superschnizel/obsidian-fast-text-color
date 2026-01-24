@@ -1,19 +1,19 @@
 # Fast Text Color
 
-This Obsidian plugin allows you to create beautifully colored interactive notes using a custom coloring syntax. 
+This Obsidian plugin allows you to create beautifully highlighted interactive notes using a custom coloring syntax.
 
 <img src="https://github.com/Superschnizel/obisdian-fast-text-color/assets/47162464/422a5839-d352-4f44-99d1-e76311a54900" width="75%">
 
-
 ## Features
+
 - Wide variety of available formatting options
 - Full live preview support
 - Multiple ways of applying/removing color to suit your individual needs
-	- Multiple intuitive editor integrations
-	- Custom coloring syntax that neatly integrates into Obsidian Markdown
-	- Keyboard-only usage possible
+    - Multiple intuitive editor integrations
+    - Custom coloring syntax that neatly integrates into Obsidian Markdown
+    - Keyboard-only usage possible
 - Bundle formatting presets into themes
-	- Override active theme for individual notes through Frontmatter property
+    - Override active theme for individual notes through Frontmatter property
 - No exposed HTML in the editing view
 - Further in-depth customization using CSS classes
 
@@ -26,7 +26,7 @@ Color text sections using the following syntax:
 <img src="https://github.com/Superschnizel/obisdian-fast-text-color/assets/47162464/fdc4c624-7fc5-4b6a-9fa4-8e1de7fb97f4" width="60%">
 
 ```
-~={id} This text is colored according to the id=~
+~%{id} This text is highlighted according to the id}%~
 ```
 
 The id maps to one of the color formats provided by the current active theme, which can be selected in the settings.
@@ -35,7 +35,7 @@ The formatting options include:
 
 - $\textsf{{\color[rgb]{1.0, 0.0, 0.0}T}{\color[rgb]{1.0, 0.5, 0.0}e}{\color[rgb]{1.0, 1.0, 0.0}x}{\color[rgb]{0.0, 1.0, 0.0}t~ }{\color[rgb]{0.0, 1.0, 1.0}c}{\color[rgb]{0.0, 0.0, 1.0}o}{\color[rgb]{0.33, 0.0, 0.5}l}{\color[rgb]{1.0, 0.0, 1.0}o}{\color[rgb]{1.0, 0.0, 0.5}r}}$: custom or provided by the active Obsidian theme.
 - **Bold**
-- *Italics*
+- _Italics_
 - <ins>Under</ins>-, o̅v̅e̅r̅-, and ~~through~~lines
 - FULL CAPS, Sᴍᴀʟʟ Cᴀᴘs
 
@@ -67,7 +67,7 @@ Calling the `change text color` command lets you choose one of the colors that a
 
 #### Coloring Menu
 
-If the option *Use keybindings and colormenu* is set, calling the `change text color` command instead opens the coloring menu.
+If the option _Use keybindings and colormenu_ is set, calling the `change text color` command instead opens the coloring menu.
 
 You can select a color by clicking the corresponding button or using the keybind assigned in the theme editor.
 
@@ -81,19 +81,19 @@ You can select a color by clicking the corresponding button or using the keybind
 These issues mainly arise from the different techniques required for live preview and reading mode and will be fixed in the future.
 
 - **Reading Mode**.
-	- An unopened closing delimiter `=~` will lead to problems in reading mode.
+    - An unopened closing delimiter `}%~` will lead to problems in reading mode.
 
 ## Planned Features
 
 - [x] Selectable color themes
 - [ ] More/better ways to apply color
-	- [x] Submenu in editor context menu
-    - [ ] Suggester modal
- - [x] Changing color through interactive delimiter
- - [ ] Individual commands for theme colors
- - [ ] Automatically color by keyword
- - [ ] More (custom) CSS options
- - [ ] Full note commands (color by keyword etc.)
+    - [x] Submenu in editor context menu
+        - [ ] Suggester modal
+- [x] Changing color through interactive delimiter
+- [ ] Individual commands for theme colors
+- [ ] Automatically color by keyword
+- [ ] More (custom) CSS options
+- [ ] Full note commands (color by keyword etc.)
 
 ## How It Works
 

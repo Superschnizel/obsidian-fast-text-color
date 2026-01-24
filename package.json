@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
+	"name": "obsidian-plugin-fast-text-highlight",
 	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"description": "Simple inline tool for highlighting text, forked from Fast Text Color plugin",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
@@ -11,8 +11,8 @@
 		"grammar": "node ./node_modules/@lezer/generator/src/lezer-generator.cjs ./src/rendering/language/textColorLanguage.grammar -o ./src/rendering/language/textColorLanguageParser.js"
 	},
 	"keywords": [],
-	"author": "",
-	"license": "MIT",
+	"author": "Claire Froelich",
+	"license": "GNU",
 	"devDependencies": {
 		"@types/jest": "^29.5.12",
 		"@types/node": "^16.11.6",

@@ -8,21 +8,29 @@ import {
 	ButtonComponent,
 	Modal,
 	WorkspaceWindow,
-} from 'obsidian';
-import { DEFAULT_SETTINGS, FastTextColorPluginSettingTab, FastTextColorPluginSettings, getColors, SETTINGS_VERSION, updateSettings, CSS_COLOR_PREFIX, getCurrentTheme } from 'src/FastTextColorSettings';
-import { TextColor, LatestColor } from 'src/color/TextColor';
-import { PREFIX, SUFFIX } from 'src/utils/regularExpressions';
-import { textColorViewPlugin } from 'src/rendering/TextColorViewPlugin'
-import { textColorParserField } from 'src/rendering/TextColorStateField';
-import { textColorPostProcessor } from 'src/rendering/TextColorPostProcessor'
+} from "obsidian";
+import {
+	DEFAULT_SETTINGS,
+	FastTextColorPluginSettingTab,
+	FastTextColorPluginSettings,
+	getColors,
+	SETTINGS_VERSION,
+	updateSettings,
+	CSS_COLOR_PREFIX,
+	getCurrentTheme,
+} from "src/FastTextColorSettings";
+import { TextColor, LatestColor } from "src/color/TextColor";
+import { PREFIX, SUFFIX } from "src/utils/regularExpressions";
+import { textColorViewPlugin } from "src/rendering/TextColorViewPlugin";
+import { textColorParserField } from "src/rendering/TextColorStateField";
+import { textColorPostProcessor } from "src/rendering/TextColorPostProcessor";
 import { EditorState, Prec, Extension, Compartment } from "@codemirror/state";
-import { keymap, EditorView } from '@codemirror/view'
+import { keymap, EditorView } from "@codemirror/view";
 import { settingsFacet } from "./src/SettingsFacet";
 import { applyColor, removeColor } from "src/color/TextColorFunctions";
-import { ColorSuggestModal } from 'src/utils/ColorSuggestModal';
+import { ColorSuggestModal } from "src/utils/ColorSuggestModal";
 
 const MAX_MENU_ITEMS: number = 10;
-
 
 export default class FastTextColorPlugin extends Plugin {
 	settings: FastTextColorPluginSettings;
@@ -41,17 +49,21 @@ export default class FastTextColorPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		this.styleElements = new Map < Window, HTMLElement | null > ();
+		this.styleElements = new Map<Window, HTMLElement | null>();
 
 		// setup Editor Extensions
 		this.registerEditorExtension(textColorParserField);
 		this.registerEditorExtension(textColorViewPlugin);
-		this.registerMarkdownPostProcessor((el, ctx) => { textColorPostProcessor(el, ctx, this.settings); }, -1000);
+		this.registerMarkdownPostProcessor((el, ctx) => {
+			textColorPostProcessor(el, ctx, this.settings);
+		}, -1000);
 		// this.registerMarkdownPostProcessor((el, ctx) => { textColorPostProcessor(el, ctx, this.settings); }, 1000);
 
 		// to make settings available in the ViewPlugin.
 		this.settingsCompartment = new Compartment();
-		this.settingsExtension = this.settingsCompartment.of(settingsFacet.of(this.settings));
+		this.settingsExtension = this.settingsCompartment.of(
+			settingsFacet.of(this.settings),
+		);
 		this.registerEditorExtension(this.settingsExtension);
 
 		// initialize LatestColor
@@ -64,78 +76,81 @@ export default class FastTextColorPlugin extends Plugin {
 						key: "Tab",
 						run: (editorView) => this.jumpOut(editorView),
 					},
-				])
-			)
+				]),
+			),
 		);
 
 		this.addCommand({
-			id: 'change-text-color',
-			name: 'Change text color',
-			editorCallback: (editor: Editor) => { // for this to work, needs to be in editor mode
+			id: "change-text-color",
+			name: "Change text color",
+			editorCallback: (editor: Editor) => {
+				// for this to work, needs to be in editor mode
 				this.openColorMenu(editor);
-			}
+			},
 		});
 
 		this.addCommand({
-			id: 'text-color-latestcolor',
-			name: 'Apply latest color',
+			id: "text-color-latestcolor",
+			name: "Apply latest color",
 			editorCallback: (editor: Editor) => {
 				applyColor(LatestColor.getInstance().getColor(), editor);
-			}
+			},
 		});
 
 		this.addCommand({
-			id: 'remove-text-color',
-			name: 'Remove text color',
+			id: "remove-text-color",
+			name: "Remove text color",
 			editorCallback: (editor, view) => {
 				// @ts-expect-error, not typed
 				const editorView = view.editor.cm as EditorView;
 
 				removeColor(editor, editorView);
-			}
-		})
+			},
+		});
 
 		// add coloring to editor context menu.
 		this.registerEvent(
 			this.app.workspace.on("editor-menu", (menu, editor, view) => {
-				if (editor.getSelection() == '') {
+				if (editor.getSelection() == "") {
 					return;
 				}
 				menu.addItem((item) => {
-					item
-						.setSection("selection")
+					item.setSection("selection")
 						.setTitle("Color")
 						.setIcon("palette");
 					// @ts-ignore
 					const submenu: Menu = item.setSubmenu();
-					getColors(this.settings).forEach(tColor => {
+					getColors(this.settings).forEach((tColor) => {
 						submenu.addItem((subitem) => {
-
 							subitem
 								.setTitle(tColor.id)
 								.setIcon("circle")
-								.onClick(evt => {
+								.onClick((evt) => {
 									applyColor(tColor, editor);
 								});
 
 							// @ts-ignore
-							(subitem.dom as HTMLElement).addClass(tColor.className);
+							(subitem.dom as HTMLElement).addClass(
+								tColor.className,
+							);
 							// @ts-ignore
-							(subitem.iconEl as HTMLElement).addClass(tColor.className);
-						})
+							(subitem.iconEl as HTMLElement).addClass(
+								tColor.className,
+							);
+						});
 					});
 					submenu.addItem((subitem) => {
 						subitem
 							.setTitle("remove")
 							.setIcon("ban")
-							.onClick(evt => {
+							.onClick((evt) => {
 								// @ts-expect-error, not typed
 								const editorView = view.editor.cm as EditorView;
 								removeColor(editor, editorView);
 							});
-					})
-				})
-			})
+					});
+				});
+			}),
 		);
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
@@ -145,7 +160,9 @@ export default class FastTextColorPlugin extends Plugin {
 			this.styleElements.set(window, null);
 			this.setCssVariables();
 		});
-		this.app.workspace.on("window-close", (_, window) => { this.styleElements.delete(window) });
+		this.app.workspace.on("window-close", (_, window) => {
+			this.styleElements.delete(window);
+		});
 
 		this.styleElements.set(activeWindow, null);
 
@@ -167,20 +184,36 @@ export default class FastTextColorPlugin extends Plugin {
 
 		// if settings already exists but are an older version
 		if (rawSettings && +rawSettings.version < +SETTINGS_VERSION) {
-			console.log("outdated Settings! Trying to update.")
-			this.settings = updateSettings(rawSettings)
+			console.debug("outdated Settings! Trying to update.");
+			this.settings = updateSettings(rawSettings);
 			await this.saveData(this.settings);
 			return;
 		}
 
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		this.settings = Object.assign(
+			{},
+			DEFAULT_SETTINGS,
+			await this.loadData(),
+		);
 
-		// reinitialize theme 
+		// reinitialize theme
 		for (let j = 0; j < this.settings.themes.length; j++) {
 			const colors = getColors(this.settings, j);
 			for (let i = 0; i < colors.length; i++) {
-				let obj: TextColor = colors[i]
-				colors[i] = new TextColor(obj.color, obj.id, this.settings.themes[j].name, obj.italic, obj.bold, obj.cap_mode.index, obj.line_mode.index, obj.keybind, obj.useCssColorVariable, obj.colorVariable);
+				let obj: TextColor = colors[i];
+				colors[i] = new TextColor(
+					obj.color,
+					obj.id,
+					this.settings.themes[j].name,
+					obj.italic,
+					obj.bold,
+					obj.cap_mode.index,
+					obj.line_mode.index,
+					obj.keybind,
+					obj.useCssColorVariable,
+					obj.colorVariable,
+					obj.textColor ?? "#000000",
+				);
 			}
 		}
 	}
@@ -196,8 +229,10 @@ export default class FastTextColorPlugin extends Plugin {
 		}
 
 		editorView.dispatch({
-			effects: this.settingsCompartment.reconfigure(settingsFacet.of(this.settings))
-		})
+			effects: this.settingsCompartment.reconfigure(
+				settingsFacet.of(this.settings),
+			),
+		});
 	}
 
 	// create and open the color menu
@@ -207,25 +242,27 @@ export default class FastTextColorPlugin extends Plugin {
 	 * @param {Editor} editor - [TODO:description]
 	 */
 	openColorMenu(editor: Editor) {
-
 		// if keybindings are not used create a normal choice
 		if (!this.settings.useKeybindings) {
-			let modal = new ColorSuggestModal(this.app, getColors(this.settings), editor);
+			let modal = new ColorSuggestModal(
+				this.app,
+				getColors(this.settings),
+				editor,
+			);
 			modal.open();
 			return;
 		}
 
-
 		// TODO: do i really need to rebuild this every time?
 		if (this.colorMenu != null) {
-			// console.log('colorMenu already exists');
+			// console.debug('colorMenu already exists');
 			return;
 		}
 
 		this.colorMenu = createDiv();
 		if (!this.colorMenu) {
-			// console.log("could not create colorMenu.");
-			new Notice("could not create Colormenu!")
+			// console.debug("could not create colorMenu.");
+			new Notice("could not create Colormenu!");
 			return;
 		}
 
@@ -235,20 +272,25 @@ export default class FastTextColorPlugin extends Plugin {
 		this.colorMenu.setAttribute("id", "fast-color-menu");
 		this.colorMenu.addClass("fast-color-menu");
 
-		// add menu to the workspace, adapted from 
+		// add menu to the workspace, adapted from
 		// cMenu https://github.com/chetachiezikeuzor/cMenu-Plugin/blob/master/src/modals/cMenuModal.ts#L5
-		activeDocument.body.querySelector(".mod-vertical.mod-root")?.insertAdjacentElement("afterbegin", this.colorMenu);
+		activeDocument.body
+			.querySelector(".mod-vertical.mod-root")
+			?.insertAdjacentElement("afterbegin", this.colorMenu);
 
 		let colors = getColors(this.settings);
 
 		for (let i = 0; i < colors.length; i++) {
-			// console.log(colors[i].getColorValue());
+			// console.debug(colors[i].getColorValue());
 
 			this.createColorItem(this.colorMenu, colors[i], i + 1, editor);
 		}
 
 		// have to apply it again, otherwise menu will not be centered.
-		this.colorMenu.setAttribute("style", `left: calc(50% - ${this.colorMenu.offsetWidth}px / 2); ${attributes}`);
+		this.colorMenu.setAttribute(
+			"style",
+			`left: calc(50% - ${this.colorMenu.offsetWidth}px / 2); ${attributes}`,
+		);
 
 		if (!this.settings.useKeybindings) {
 			return;
@@ -275,7 +317,7 @@ export default class FastTextColorPlugin extends Plugin {
 		for (let i = 0; i < getColors(this.settings).length; i++) {
 			const tColor = getColors(this.settings)[i];
 
-			if (!tColor.keybind || tColor.keybind == '') {
+			if (!tColor.keybind || tColor.keybind == "") {
 				continue;
 			}
 
@@ -299,7 +341,7 @@ export default class FastTextColorPlugin extends Plugin {
 
 			this.closeColorMenu();
 			return false;
-		})
+		});
 		scope.register([], "Delete", (event) => {
 			if (event.isComposing) {
 				return true;
@@ -307,7 +349,7 @@ export default class FastTextColorPlugin extends Plugin {
 
 			this.closeColorMenu();
 			return false;
-		})
+		});
 		scope.register([], "Backspace", (event) => {
 			if (event.isComposing) {
 				return true;
@@ -315,7 +357,7 @@ export default class FastTextColorPlugin extends Plugin {
 
 			this.closeColorMenu();
 			return false;
-		})
+		});
 
 		// TODO arrow keys movement.
 		// TODO mouse click ends
@@ -331,7 +373,8 @@ export default class FastTextColorPlugin extends Plugin {
 		//@ts-ignore
 		const state: EditorState = editorView.state;
 		const tree = state.field(textColorParserField).tree;
-		const editor = this.app.workspace.getActiveViewOfType(MarkdownView)?.editor;
+		const editor =
+			this.app.workspace.getActiveViewOfType(MarkdownView)?.editor;
 		if (!editor) {
 			return false;
 		}
@@ -346,23 +389,33 @@ export default class FastTextColorPlugin extends Plugin {
 			return false;
 		}
 
-
 		editor.setCursor(editor.offsetToPos(inner.to));
 
 		return true;
 	}
 
-	createColorItem(menu: HTMLDivElement, tColor: TextColor, counter: number, editor: Editor) {
+	createColorItem(
+		menu: HTMLDivElement,
+		tColor: TextColor,
+		counter: number,
+		editor: Editor,
+	) {
 		new ButtonComponent(menu)
 			.setButtonText(`${tColor.keybind}`)
 			.setClass("fast-color-menu-item")
 			.onClick(() => {
 				let n = new Notice("activated color");
-				n.noticeEl.setAttr("style", `background-color: ${tColor.getColorValue()}`);
+				n.noticeEl.setAttr(
+					"style",
+					`background-color: ${tColor.getColorValue()}`,
+				);
 				applyColor(tColor, editor);
 				this.closeColorMenu();
 			})
-			.buttonEl.setAttr("style", `background-color: ${tColor.getColorValue()}`);
+			.buttonEl.setAttr(
+				"style",
+				`background-color: ${tColor.getColorValue()}`,
+			);
 	}
 
 	addWindow(window: Window) {
@@ -385,13 +438,13 @@ export default class FastTextColorPlugin extends Plugin {
 		// iterate over all known windows and create stylesheets if not already present.
 		this.styleElements.forEach((styleElement, win) => {
 			if (!styleElement) {
-				let root = win.document.querySelector(':root');
+				let root = win.document.querySelector(":root");
 
 				if (!root) {
 					return;
 				}
 
-				styleElement = root.createEl('style');
+				styleElement = root.createEl("style");
 				styleElement.id = "fast-text-color-stylesheet";
 
 				this.styleElements.set(win, styleElement);
@@ -399,20 +452,25 @@ export default class FastTextColorPlugin extends Plugin {
 
 			styleElement.textContent = "";
 			const formatCss = (css: string) => {
-				const lines = css.split('\n').map(l => l.trim()).filter(l => l.length);
-				if (lines.length <= 5) { // format as a single line
-					return lines.join(' ');
+				const lines = css
+					.split("\n")
+					.map((l) => l.trim())
+					.filter((l) => l.length);
+				if (lines.length <= 5) {
+					// format as a single line
+					return lines.join(" ");
 				}
-				return lines.map(l => /[{}]/.test(l) ? l : `  ${l}`).join('\n');
+				return lines
+					.map((l) => (/[{}]/.test(l) ? l : `  ${l}`))
+					.join("\n");
 			};
 			// dynamically create stylesheet.
 			for (let i = 0; i < this.settings.themes.length; i++) {
 				getColors(this.settings, i).forEach((tColor: TextColor) => {
-
-					const theme = this.settings.themes[i]
-					const className = `.${CSS_COLOR_PREFIX}${theme.name}-${tColor.id}`;
-					let cssClass = `${className} {\n${tColor.getInnerCss(this.settings)}\n}`;
-
+					const theme = this.settings.themes[i];
+					const classNameWithTheme = `.${CSS_COLOR_PREFIX}${theme.name}-${tColor.id}`;
+					const classNameNoTheme = `.${CSS_COLOR_PREFIX}${tColor.id}`;
+					let cssClass = `${classNameWithTheme}, ${classNameNoTheme} {\n${tColor.getInnerCss(this.settings)}\n}`;
 					styleElement!.textContent += formatCss(cssClass) + "\n";
 				});
 			}
@@ -451,12 +509,5 @@ export default class FastTextColorPlugin extends Plugin {
 		// 		this.styleElement!.textContent += formatCss(cssClass) + "\n";
 		// 	});
 		// }
-
 	}
 }
-
-
-
-
-
-

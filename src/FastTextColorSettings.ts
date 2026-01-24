@@ -1,20 +1,26 @@
-import FastTextColorPlugin from 'main';
-import { App, ButtonComponent, Notice, PluginSettingTab, Setting } from "obsidian";
+import FastTextColorPlugin from "main";
+import {
+	App,
+	ButtonComponent,
+	Notice,
+	PluginSettingTab,
+	Setting,
+} from "obsidian";
 import { TextColor } from "./color/TextColor";
 import { TextColorTheme } from "./color/TextColorTheme";
-import { confirmByModal } from "./utils/ConfirmationModal"
-import { CreateNewThemeModal } from './utils/CreateNewThemeModal';
-import { getKeyBindWithModal } from "./utils/KeyBindModal"
-import { validateColorName } from './utils/validateColorName';
+import { confirmByModal } from "./utils/ConfirmationModal";
+import { CreateNewThemeModal } from "./utils/CreateNewThemeModal";
+import { getKeyBindWithModal } from "./utils/KeyBindModal";
+import { validateColorName } from "./utils/validateColorName";
 
 // --------------------------------------------------------------------------
 //                            CONSTANTS
 // --------------------------------------------------------------------------
 
-export const CSS_COLOR_PREFIX = "ftc-color-"
-export const VAR_COLOR_PREFIX = "--ftc-color-"
+export const CSS_COLOR_PREFIX = "fth-color-";
+export const VAR_COLOR_PREFIX = "--fth-color-";
 
-export const SETTINGS_VERSION = "3"
+export const SETTINGS_VERSION = "3";
 
 // "--color-red": "red",
 // "--color-orange": "orange",
@@ -25,36 +31,218 @@ export const SETTINGS_VERSION = "3"
 // "--color-purple": "purple",
 // "--color-pink": "pink",
 export const BUILTIN_COLORS = [
-	new TextColor("#000000", "red", "builtin", false, false, 0, 0, 'R', true, "--color-red"),
-	new TextColor("#000000", "orange", "builtin", false, false, 0, 0, 'O', true, "--color-orange"),
-	new TextColor("#000000", "yellow", "builtin", false, false, 0, 0, 'Y', true, "--color-yellow"),
-	new TextColor("#000000", "green", "builtin", false, false, 0, 0, 'G', true, "--color-green"),
-	new TextColor("#000000", "cyan", "builtin", false, false, 0, 0, 'C', true, "--color-cyan"),
-	new TextColor("#000000", "blue", "builtin", false, false, 0, 0, 'B', true, "--color-blue"),
-	new TextColor("#000000", "purple", "builtin", false, false, 0, 0, 'P', true, "--color-purple"),
-	new TextColor("#000000", "pink", "builtin", false, false, 0, 0, 'I', true, "--color-pink"),
-]
+	new TextColor(
+		"#000000",
+		"red",
+		"builtin",
+		false,
+		false,
+		0,
+		0,
+		"R",
+		true,
+		"--color-red",
+		"#ffffff",
+	),
+	new TextColor(
+		"#000000",
+		"orange",
+		"builtin",
+		false,
+		false,
+		0,
+		0,
+		"O",
+		true,
+		"--color-orange",
+		"#000000",
+	),
+	new TextColor(
+		"#000000",
+		"yellow",
+		"builtin",
+		false,
+		false,
+		0,
+		0,
+		"Y",
+		true,
+		"--color-yellow",
+		"#000000",
+	),
+	new TextColor(
+		"#000000",
+		"green",
+		"builtin",
+		false,
+		false,
+		0,
+		0,
+		"G",
+		true,
+		"--color-green",
+		"#000000",
+	),
+	new TextColor(
+		"#000000",
+		"cyan",
+		"builtin",
+		false,
+		false,
+		0,
+		0,
+		"C",
+		true,
+		"--color-cyan",
+		"#000000",
+	),
+	new TextColor(
+		"#000000",
+		"blue",
+		"builtin",
+		false,
+		false,
+		0,
+		0,
+		"B",
+		true,
+		"--color-blue",
+		"#ffffff",
+	),
+	new TextColor(
+		"#000000",
+		"purple",
+		"builtin",
+		false,
+		false,
+		0,
+		0,
+		"P",
+		true,
+		"--color-purple",
+		"#ffffff",
+	),
+	new TextColor(
+		"#000000",
+		"pink",
+		"builtin",
+		false,
+		false,
+		0,
+		0,
+		"I",
+		true,
+		"--color-pink",
+		"#000000",
+	),
+];
 
 export const DEFAULT_COLORS = [
-	new TextColor("#ff0000", `red`, "default", false, false, 0, 0, 'R'),
-	new TextColor("#00ff00", `green`, "default", false, false, 0, 0, 'G'),
-	new TextColor("#0000ff", `blue`, "default", false, false, 0, 0, 'B'),
-	new TextColor("#00ffff", `cyan`, "default", false, false, 0, 0, 'C'),
-	new TextColor("#ff00ff", `magenta`, "default", false, false, 0, 0, 'M'),
-	new TextColor("#ffff00", `yellow`, "default", false, false, 0, 0, 'Y'),
-	new TextColor("#000000", `black`, "default", false, false, 0, 0, 'K')];
-
+	new TextColor(
+		"#ff0000",
+		`red`,
+		"default",
+		false,
+		false,
+		0,
+		0,
+		"R",
+		false,
+		"--color-base-00",
+		"#ffffff",
+	),
+	new TextColor(
+		"#00ff00",
+		`green`,
+		"default",
+		false,
+		false,
+		0,
+		0,
+		"G",
+		false,
+		"--color-base-00",
+		"#000000",
+	),
+	new TextColor(
+		"#0000ff",
+		`blue`,
+		"default",
+		false,
+		false,
+		0,
+		0,
+		"B",
+		false,
+		"--color-base-00",
+		"#ffffff",
+	),
+	new TextColor(
+		"#00ffff",
+		`cyan`,
+		"default",
+		false,
+		false,
+		0,
+		0,
+		"C",
+		false,
+		"--color-base-00",
+		"#000000",
+	),
+	new TextColor(
+		"#ff00ff",
+		`magenta`,
+		"default",
+		false,
+		false,
+		0,
+		0,
+		"M",
+		false,
+		"--color-base-00",
+		"#000000",
+	),
+	new TextColor(
+		"#ffff00",
+		`yellow`,
+		"default",
+		false,
+		false,
+		0,
+		0,
+		"Y",
+		false,
+		"--color-base-00",
+		"#000000",
+	),
+	new TextColor(
+		"#000000",
+		`black`,
+		"default",
+		false,
+		false,
+		0,
+		0,
+		"K",
+		false,
+		"--color-base-00",
+		"#ffffff",
+	),
+];
 
 export const DEFAULT_SETTINGS: FastTextColorPluginSettings = {
-	themes: [new TextColorTheme("builtin", BUILTIN_COLORS), new TextColorTheme("default", DEFAULT_COLORS)],
+	themes: [
+		new TextColorTheme("builtin", BUILTIN_COLORS),
+		new TextColorTheme("default", DEFAULT_COLORS),
+	],
 	themeIndex: 0,
 	version: SETTINGS_VERSION,
 	interactiveDelimiters: true,
 	useKeybindings: false,
 	useNodeRebuilding: false,
 	colorCodeSection: false,
-}
-
+};
 
 export interface FastTextColorPluginSettings {
 	themes: Array<TextColorTheme>;
@@ -76,22 +264,27 @@ export interface FastTextColorPluginSettings {
  *
  * @param {FastTextColorPluginSettings} settings - the plugin settings
  * @param {number} [index] - the index.
- * @returns {TextColor[]} 
+ * @returns {TextColor[]}
  */
-export function getColors(settings: FastTextColorPluginSettings, index: number = -1): TextColor[] {
+export function getColors(
+	settings: FastTextColorPluginSettings,
+	index: number = -1,
+): TextColor[] {
 	if (index == -1) {
 		index = settings.themeIndex;
 	}
 	return settings.themes[index].colors;
 }
 
-
 /**
  * get the current theme
  *
  * @param {FastTextColorPluginSettings} settings - the plugin settings.
  */
-export function getCurrentTheme(settings: FastTextColorPluginSettings, index: number = -1): TextColorTheme {
+export function getCurrentTheme(
+	settings: FastTextColorPluginSettings,
+	index: number = -1,
+): TextColorTheme {
 	if (index == -1) {
 		index = settings.themeIndex;
 	}
@@ -106,7 +299,11 @@ export function getCurrentTheme(settings: FastTextColorPluginSettings, index: nu
  * @param {string} name - the name of the new theme.
  * @param {TextColor[]} [DEFAULT_COLORS] - custom colors can be set.
  */
-export function addTheme(settings: FastTextColorPluginSettings, name: string, colors: TextColor[] = DEFAULT_COLORS) {
+export function addTheme(
+	settings: FastTextColorPluginSettings,
+	name: string,
+	colors: TextColor[] = DEFAULT_COLORS,
+) {
 	settings.themes.push(new TextColorTheme(name, colors));
 }
 
@@ -125,7 +322,9 @@ export function selectNextTheme(settings: FastTextColorPluginSettings) {
  * @param {FastTextColorPluginSettings} settings - the plugin settings.
  */
 export function selectPreviousTheme(settings: FastTextColorPluginSettings) {
-	settings.themeIndex = (settings.themes.length + settings.themeIndex - 1) % settings.themes.length;
+	settings.themeIndex =
+		(settings.themes.length + settings.themeIndex - 1) %
+		settings.themes.length;
 }
 
 /**
@@ -133,7 +332,10 @@ export function selectPreviousTheme(settings: FastTextColorPluginSettings) {
  *
  * @param {FastTextColorPluginSettings} settings - the plugin settings.
  */
-export function deleteTheme(settings: FastTextColorPluginSettings, index: number = -1) {
+export function deleteTheme(
+	settings: FastTextColorPluginSettings,
+	index: number = -1,
+) {
 	if (settings.themes.length <= 1) {
 		return;
 	}
@@ -152,15 +354,24 @@ export function deleteTheme(settings: FastTextColorPluginSettings, index: number
  * Update the settings if their version is not current.
  *
  * @param {any} settings - the plugin settings.
- * @returns {FastTextColorPluginSettings} 
+ * @returns {FastTextColorPluginSettings}
  */
 export function updateSettings(settings: any): FastTextColorPluginSettings {
 	switch (settings.version) {
 		case "1":
 		case "2":
 			const colors = settings.colors.map((color: TextColor) => {
-				return new TextColor(color.color, color.id, "default", color.italic, color.bold, color.cap_mode.index, color.line_mode.index, color.keybind);
-			})
+				return new TextColor(
+					color.color,
+					color.id,
+					"default",
+					color.italic,
+					color.bold,
+					color.cap_mode.index,
+					color.line_mode.index,
+					color.keybind,
+				);
+			});
 			const outSettings: FastTextColorPluginSettings = {
 				themes: [new TextColorTheme("default", colors)],
 				themeIndex: 0,
@@ -169,11 +380,13 @@ export function updateSettings(settings: any): FastTextColorPluginSettings {
 				useKeybindings: true,
 				useNodeRebuilding: false,
 				colorCodeSection: settings.colorCodeSection,
-			}
+			};
 			return outSettings;
 
 		default:
-			console.log(`There is not update method for Settings Version ${settings.version}!\n${settings}`);
+			console.debug(
+				`There is not update method for Settings Version ${settings.version}!\n${settings}`,
+			);
 
 			return DEFAULT_SETTINGS;
 	}
@@ -193,10 +406,9 @@ export class FastTextColorPluginSettingTab extends PluginSettingTab {
 	constructor(app: App, plugin: FastTextColorPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
-		this.newId = ''
+		this.newId = "";
 		this.editThemeIndex = plugin.settings.themeIndex;
 	}
-
 
 	display(): void {
 		const { containerEl } = this;
@@ -204,25 +416,27 @@ export class FastTextColorPluginSettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		new Setting(containerEl).setName('Colors').setHeading();
+		new Setting(containerEl).setName("Colors").setHeading();
 
 		new Setting(containerEl)
 			.setName("Set active theme")
-			.setDesc("Set the active theme that will be used to color text. \nCan be overwritten per note by setting the property ftcTheme to a valid theme name.")
-			.addDropdown(dd => {
+			.setDesc(
+				"Set the active theme that will be used to color text. \nCan be overwritten per note by setting the property ftcTheme to a valid theme name.",
+			)
+			.addDropdown((dd) => {
 				let count = 0;
-				settings.themes.forEach(theme => {
-					dd.addOption(count.toString(), theme.name)
+				settings.themes.forEach((theme) => {
+					dd.addOption(count.toString(), theme.name);
 					count++;
 				});
-				dd.setValue(settings.themeIndex.toString())
-				dd.onChange(value => {
+				dd.setValue(settings.themeIndex.toString());
+				dd.onChange((value) => {
 					settings.themeIndex = +value;
 					this.plugin.saveSettings();
 					this.plugin.setCssVariables();
 					this.display();
-				})
-			})
+				});
+			});
 
 		// ------------------------------------------------------------------
 		//                       THEME SETTINGS
@@ -231,88 +445,121 @@ export class FastTextColorPluginSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("Edit themes")
 			.setDesc("Add new themes or edit existings ones.")
-			.setClass("ftc-settings-theme-header")
-			.addDropdown(dd => {
+			.setClass("fth-settings-theme-header")
+			.addDropdown((dd) => {
 				let count = 0;
-				settings.themes.forEach(theme => {
-					dd.addOption(count.toString(), theme.name)
+				settings.themes.forEach((theme) => {
+					dd.addOption(count.toString(), theme.name);
 					count++;
 				});
-				dd.setValue(this.editThemeIndex.toString())
-				dd.onChange(value => {
+				dd.setValue(this.editThemeIndex.toString());
+				dd.onChange((value) => {
 					this.editThemeIndex = +value;
 					this.display();
-				})
+				});
 			})
-			.addButton(btn => {
-				btn
-					.setIcon("plus")
+			.addButton((btn) => {
+				btn.setIcon("plus")
 					.setTooltip("add new Theme")
-					.onClick(evt => {
-						const modal = new CreateNewThemeModal(this.app, settings);
+					.onClick((evt) => {
+						const modal = new CreateNewThemeModal(
+							this.app,
+							settings,
+						);
 						modal.onSuccess(() => {
 							this.plugin.saveSettings();
-							this.display()
+							this.display();
 						});
 						modal.open();
-					})
+					});
 			})
-			.addButton(btn => {
-				btn
-					.setIcon("trash")
+			.addButton((btn) => {
+				btn.setIcon("trash")
 					.setTooltip("delete theme")
-					.onClick(async evt => {
-						if (await confirmByModal(this.app, `Are you sure?\n The theme ${settings.themes[settings.themeIndex].name} will no longer be available. `)) {
+					.onClick(async (evt) => {
+						if (
+							await confirmByModal(
+								this.app,
+								`Are you sure?\n The theme ${settings.themes[settings.themeIndex].name} will no longer be available. `,
+							)
+						) {
 							deleteTheme(settings, this.editThemeIndex);
 							this.editThemeIndex = 0;
 							this.plugin.saveSettings();
 							this.display();
 						}
-					})
-
-			})
+					});
+			});
 
 		const themeColorsEl = containerEl.createDiv();
-		themeColorsEl.addClass("ftc-theme-colors");
+		themeColorsEl.addClass("fth-theme-colors");
 
 		// Create Settings for individual Colors.
 		let count = 1;
 		getColors(settings, this.editThemeIndex).forEach((color: TextColor) => {
-			this.createColorSetting(themeColorsEl, color, count, this.editThemeIndex);
+			this.createColorSetting(
+				themeColorsEl,
+				color,
+				count,
+				this.editThemeIndex,
+			);
 			count++;
 		});
 
 		const addNewColorGroup = new Setting(containerEl)
 			.setName("Add new color to theme")
-			.setClass("ftc-settings-theme-footer")
-			.addText(txt => {
-				txt
-					.setValue(this.newId == '' ? (getColors(settings).length + 1).toString() : this.newId)
-					.onChange(value => {
-						const isValid = validateColorName(value);
-						const button = addNewColorGroup
-							.components.filter((component): component is ButtonComponent => 'buttonEl' in component)
-							.at(0);
-						button?.setDisabled(!isValid);
-						button?.setTooltip(isValid ? '' : 'The color name must not contain any whitespace characters.')
-						this.newId = value;
-					})
+			.setClass("fth-settings-theme-footer")
+			.addText((txt) => {
+				txt.setValue(
+					this.newId == ""
+						? (getColors(settings).length + 1).toString()
+						: this.newId,
+				).onChange((value) => {
+					const isValid = validateColorName(value);
+					const button = addNewColorGroup.components
+						.filter(
+							(component): component is ButtonComponent =>
+								"buttonEl" in component,
+						)
+						.at(0);
+					button?.setDisabled(!isValid);
+					button?.setTooltip(
+						isValid
+							? ""
+							: "The color name must not contain any whitespace characters.",
+					);
+					this.newId = value;
+				});
 			})
-			.addButton(btn => {
-				btn.setButtonText("+")
-					.onClick(async evt => {
-						let colors = getColors(settings, this.editThemeIndex);
-						if (colors.some(tColor => { return tColor.id == this.newId })) {
-							new Notice(`color with id ${this.newId} already exists!`);
-							return;
-						}
+			.addButton((btn) => {
+				btn.setButtonText("+").onClick(async (evt) => {
+					let colors = getColors(settings, this.editThemeIndex);
+					if (
+						colors.some((tColor) => {
+							return tColor.id == this.newId;
+						})
+					) {
+						new Notice(
+							`color with id ${this.newId} already exists!`,
+						);
+						return;
+					}
 
-						let newColorName = this.newId == '' ? (colors.length + 1).toString() : this.newId;
-						colors.push(new TextColor("#ffffff", newColorName, getCurrentTheme(settings, this.editThemeIndex).name));
-						await this.plugin.saveSettings();
-						this.display();
-					});
-			})
+					let newColorName =
+						this.newId == ""
+							? (colors.length + 1).toString()
+							: this.newId;
+					colors.push(
+						new TextColor(
+							"#ffffff",
+							newColorName,
+							getCurrentTheme(settings, this.editThemeIndex).name,
+						),
+					);
+					await this.plugin.saveSettings();
+					this.display();
+				});
+			});
 		// .addButton(btn => {
 		// 	btn
 		// 		.setButtonText("-")
@@ -324,38 +571,45 @@ export class FastTextColorPluginSettingTab extends PluginSettingTab {
 		// 		})
 		// })
 		// containerEl.createEl('h1').innerText = "Other";
-		new Setting(containerEl).setName('Other').setHeading();
+		new Setting(containerEl).setName("Other").setHeading();
 		new Setting(containerEl)
 			.setName("Interactive delimiters")
-			.setDesc("Use interactive delimiter to change colors inside the editor.")
-			.addToggle(tgl => {
-				tgl.setValue(settings.interactiveDelimiters)
-					.onChange(async value => {
+			.setDesc(
+				"Use interactive delimiter to change colors inside the editor.",
+			)
+			.addToggle((tgl) => {
+				tgl.setValue(settings.interactiveDelimiters).onChange(
+					async (value) => {
 						settings.interactiveDelimiters = value;
 						await this.plugin.saveSettings();
-					})
-			})
+					},
+				);
+			});
 		new Setting(containerEl)
 			.setName("Use keybindings and colormenu")
-			.setDesc("If enabled will allow you to use keybindings to activate colors from a custom colormenu.")
-			.addToggle(tgl => {
-				tgl.setValue(settings.useKeybindings)
-					.onChange(async value => {
+			.setDesc(
+				"If enabled will allow you to use keybindings to activate colors from a custom colormenu.",
+			)
+			.addToggle((tgl) => {
+				tgl.setValue(settings.useKeybindings).onChange(
+					async (value) => {
 						settings.useKeybindings = value;
 						await this.plugin.saveSettings();
-					})
-			})
+					},
+				);
+			});
 		new Setting(containerEl)
 			.setName("Color inline code")
 			.setDesc("Apply color to inline code.")
-			.addToggle(tgl => {
-				tgl.setValue(settings.colorCodeSection)
-					.onChange(async value => {
+			.addToggle((tgl) => {
+				tgl.setValue(settings.colorCodeSection).onChange(
+					async (value) => {
 						settings.colorCodeSection = value;
 						await this.plugin.saveSettings();
 						this.plugin.setCssVariables();
-					})
-			})
+					},
+				);
+			});
 
 		// new Setting(containerEl)
 		// 	.setName("Use node rebuilding (EXPERIMENTAL)")
@@ -370,25 +624,29 @@ export class FastTextColorPluginSettingTab extends PluginSettingTab {
 	}
 
 	/**
-	 * Create a color row in the theme view 
+	 * Create a color row in the theme view
 	 *
 	 * @param {HTMLElement} container - the root container of the element.
 	 * @param {TextColor} tColor - the color to be used for display
 	 * @param {number} count - the index of the color
 	 */
-	createColorSetting(container: HTMLElement, tColor: TextColor, count: number, themeindex: number): void {
-
-		let nameFragment = new DocumentFragment()
+	createColorSetting(
+		container: HTMLElement,
+		tColor: TextColor,
+		count: number,
+		themeindex: number,
+	): void {
+		let nameFragment = new DocumentFragment();
 		let nameDiv = nameFragment.createDiv();
-		nameDiv.addClass("ftc-name-div")
+		nameDiv.addClass("fth-name-div");
 
 		const key = nameDiv.createDiv();
 		key.innerText = `${tColor.id}`;
 
-		const exampletext = nameDiv.createDiv()
+		const exampletext = nameDiv.createDiv();
 		// exampletext.addClass(`${CSS_COLOR_PREFIX}${tColor.id}`);
 		exampletext.setAttr("style", tColor.getCssInlineStyle());
-		exampletext.innerText = `~={${tColor.id}}This is colored text=~`
+		exampletext.innerText = `~%{${tColor.id}}This is highlighted text}%~`;
 
 		// utility function to apply settings and update displaytext
 		let saveAndApply = async () => {
@@ -396,118 +654,161 @@ export class FastTextColorPluginSettingTab extends PluginSettingTab {
 			this.plugin.setCssVariables();
 
 			exampletext.setAttr("style", tColor.getCssInlineStyle());
-		}
+		};
 
 		const setting = new Setting(container)
 			.setName(nameFragment)
 			// .setClass("fadeInLeft")
-			.setClass("ftc-settings-item")
+			.setClass("fth-settings-item")
 
 			// KEYBIND
-			.addButton(btn => {
-				btn
-					.setButtonText(`${tColor.keybind}`.toUpperCase())
+			.addButton((btn) => {
+				btn.setButtonText(`${tColor.keybind}`.toUpperCase())
 					.setTooltip("set keybinding")
 					.setClass("key-indicator")
 
-					.onClick(async evt => {
+					.onClick(async (evt) => {
 						tColor.keybind = await getKeyBindWithModal(this.app);
 
 						btn.setButtonText(`${tColor.keybind}`);
 						await this.plugin.saveSettings();
 
 						this.plugin.setCssVariables();
-					})
-				// btn.buttonEl.addClass("ftc-format-left")
+					});
+				// btn.buttonEl.addClass("fth-format-left")
 			})
 
 			// -------------------------------------------------------------
 			//                      FORMATTING
 			// -------------------------------------------------------------
-			.addButton(btn => {
-				btn
-					.setButtonText("B")
+			.addButton((btn) => {
+				btn.setButtonText("B")
 					.setTooltip("Bold")
-					.setClass("ftc-format-item")
+					.setClass("fth-format-item")
 
-					.onClick(async evt => {
+					.onClick(async (evt) => {
 						tColor.bold = !tColor.bold;
 
-						btn.buttonEl.toggleClass("ftc-format-item-enabled", tColor.bold);
-						btn.buttonEl.setCssStyles({ fontWeight: tColor.bold ? "bold" : "normal" });
+						btn.buttonEl.toggleClass(
+							"fth-format-item-enabled",
+							tColor.bold,
+						);
+						btn.buttonEl.setCssStyles({
+							fontWeight: tColor.bold ? "bold" : "normal",
+						});
 
-						saveAndApply()
-					})
+						saveAndApply();
+					});
 
-				btn.buttonEl.addClass("ftc-format-left")
-				btn.buttonEl.toggleClass("ftc-format-item-enabled", tColor.bold);
-				btn.buttonEl.setCssStyles({ fontWeight: tColor.bold ? "bold" : "normal" });
+				btn.buttonEl.addClass("fth-format-left");
+				btn.buttonEl.toggleClass(
+					"fth-format-item-enabled",
+					tColor.bold,
+				);
+				btn.buttonEl.setCssStyles({
+					fontWeight: tColor.bold ? "bold" : "normal",
+				});
 			})
 
-			.addButton(btn => {
-				btn
-					.setButtonText("I")
+			.addButton((btn) => {
+				btn.setButtonText("I")
 					.setTooltip("Italic")
-					.setClass("ftc-format-item")
+					.setClass("fth-format-item")
 
-					.onClick(async evt => {
+					.onClick(async (evt) => {
 						tColor.italic = !tColor.italic;
 
-						btn.buttonEl.toggleClass("ftc-format-item-enabled", tColor.italic);
-						btn.buttonEl.setCssStyles({ fontStyle: tColor.italic ? "italic" : "normal" });
+						btn.buttonEl.toggleClass(
+							"fth-format-item-enabled",
+							tColor.italic,
+						);
+						btn.buttonEl.setCssStyles({
+							fontStyle: tColor.italic ? "italic" : "normal",
+						});
 
-						saveAndApply()
-					})
+						saveAndApply();
+					});
 
-				btn.buttonEl.addClass("ftc-format-middle")
-				btn.buttonEl.toggleClass("ftc-format-item-enabled", tColor.italic);
-				btn.buttonEl.setCssStyles({ fontStyle: tColor.italic ? "italic" : "normal" });
+				btn.buttonEl.addClass("fth-format-middle");
+				btn.buttonEl.toggleClass(
+					"fth-format-item-enabled",
+					tColor.italic,
+				);
+				btn.buttonEl.setCssStyles({
+					fontStyle: tColor.italic ? "italic" : "normal",
+				});
 			})
 
-			.addButton(btn => {
-				btn
-					.setButtonText("U")
+			.addButton((btn) => {
+				btn.setButtonText("U")
 					.setTooltip("Lining")
-					.setClass("ftc-format-item")
-					.onClick(async evt => {
+					.setClass("fth-format-item")
+					.onClick(async (evt) => {
 						// cycle through enum
 						tColor.line_mode.cycle();
 
-						btn.buttonEl.toggleClass("ftc-format-item-enabled", tColor.line_mode.state != "none");
-						btn.buttonEl.setCssStyles({ textDecoration: tColor.line_mode.state });
+						btn.buttonEl.toggleClass(
+							"fth-format-item-enabled",
+							tColor.line_mode.state != "none",
+						);
+						btn.buttonEl.setCssStyles({
+							textDecoration: tColor.line_mode.state,
+						});
 
-						saveAndApply()
-					})
+						saveAndApply();
+					});
 
-				btn.buttonEl.addClass("ftc-format-middle");
-				btn.buttonEl.toggleClass("ftc-format-item-enabled", tColor.line_mode.state != "none");
-				btn.buttonEl.setCssStyles({ textDecoration: tColor.line_mode.state });
+				btn.buttonEl.addClass("fth-format-middle");
+				btn.buttonEl.toggleClass(
+					"fth-format-item-enabled",
+					tColor.line_mode.state != "none",
+				);
+				btn.buttonEl.setCssStyles({
+					textDecoration: tColor.line_mode.state,
+				});
 			})
-			.addButton(btn => {
-				btn
-					.setButtonText("Tt")
+			.addButton((btn) => {
+				btn.setButtonText("Tt")
 					.setTooltip("Capitalization")
-					.setClass("ftc-format-item")
+					.setClass("fth-format-item")
 
-					.onClick(async evt => {
+					.onClick(async (evt) => {
 						// cycle through enum
 						tColor.cap_mode.cycle();
 
-						btn.buttonEl.toggleClass("ftc-format-item-enabled", tColor.cap_mode.state != "normal");
-						btn.buttonEl.toggleClass("ftc-uppercase", tColor.cap_mode.state == "all_caps");
-						btn.buttonEl.toggleClass("ftc-small-caps", tColor.cap_mode.state == "small_caps");
+						btn.buttonEl.toggleClass(
+							"fth-format-item-enabled",
+							tColor.cap_mode.state != "normal",
+						);
+						btn.buttonEl.toggleClass(
+							"fth-uppercase",
+							tColor.cap_mode.state == "all_caps",
+						);
+						btn.buttonEl.toggleClass(
+							"fth-small-caps",
+							tColor.cap_mode.state == "small_caps",
+						);
 
 						await this.plugin.saveSettings();
 						this.plugin.setCssVariables();
 
-						exampletext.setAttr("style", tColor.getCssInlineStyle());
-					})
+						exampletext.setAttr(
+							"style",
+							tColor.getCssInlineStyle(),
+						);
+					});
 
-				btn.buttonEl.addClass("ftc-format-right");
-				btn.buttonEl.toggleClass("ftc-format-item-enabled", tColor.cap_mode.state != "normal");
+				btn.buttonEl.addClass("fth-format-right");
+				btn.buttonEl.toggleClass(
+					"fth-format-item-enabled",
+					tColor.cap_mode.state != "normal",
+				);
 				btn.buttonEl.setCssStyles(
-					tColor.cap_mode.state == "all_caps" ? { textTransform: "uppercase" }
-						: tColor.cap_mode.state == "small_caps" ? { fontVariant: "small_caps" } : {}
+					tColor.cap_mode.state == "all_caps"
+						? { textTransform: "uppercase" }
+						: tColor.cap_mode.state == "small_caps"
+							? { fontVariant: "small_caps" }
+							: {},
 				);
 			});
 
@@ -515,110 +816,143 @@ export class FastTextColorPluginSettingTab extends PluginSettingTab {
 		// -------------------------------------------------------------
 
 		if (tColor.useCssColorVariable) {
-			setting.addDropdown(dd => {
-				dd
-					.addOptions({
-						"--color-red": "red",
-						"--color-orange": "orange",
-						"--color-yellow": "yellow",
-						"--color-green": "green",
-						"--color-cyan": "cyan",
-						"--color-blue": "blue",
-						"--color-purple": "purple",
-						"--color-pink": "pink",
-						// "--color-blue" : "50",
-						// "--color-blue" : "60",
-						// "--color-blue" : "70",
-						// "--color-base-100": "100",
-					})
+			setting.addDropdown((dd) => {
+				dd.addOptions({
+					"--color-red": "red",
+					"--color-orange": "orange",
+					"--color-yellow": "yellow",
+					"--color-green": "green",
+					"--color-cyan": "cyan",
+					"--color-blue": "blue",
+					"--color-purple": "purple",
+					"--color-pink": "pink",
+				})
 					.setValue(tColor.colorVariable)
 					.onChange((value) => {
 						tColor.colorVariable = value;
-
 						saveAndApply();
-					})
-			})
+					});
+			});
 		} else {
-			setting.addColorPicker((cb) => {
-				cb
-					.setValue(tColor.color)
-					.onChange(async (value) => {
+			// Highlight color picker (background)
+			new Setting(container)
+				.setName("Highlight color (background)")
+				.addColorPicker((cb) => {
+					cb.setValue(tColor.color).onChange(async (value) => {
 						tColor.color = value;
-
 						saveAndApply();
-					})
-			})
+					});
+				});
 		}
 
+		// Text color picker (foreground) - always show
+		new Setting(container)
+			.setName("Text color (foreground)")
+			.addColorPicker((cb) => {
+				cb.setValue(tColor.textColor ?? "#000000").onChange(
+					async (value) => {
+						tColor.textColor = value;
+						saveAndApply();
+					},
+				);
+			});
 
 		// COLOR
 		// OBSIDIAN VARIABLES TOGGLE
-		setting.addButton(btn => {
-			btn
-				.setTooltip("use builtin obsidian colors")
-				.setClass("ftc-format-item-small")
+		setting
+			.addButton((btn) => {
+				btn.setTooltip("use builtin obsidian colors")
+					.setClass("fth-format-item-small")
 
-				.onClick(async evt => {
-					tColor.useCssColorVariable = !tColor.useCssColorVariable;
+					.onClick(async (evt) => {
+						tColor.useCssColorVariable =
+							!tColor.useCssColorVariable;
 
-					btn.buttonEl.toggleClass("ftc-format-item-enabled", tColor.useCssColorVariable);
+						btn.buttonEl.toggleClass(
+							"fth-format-item-enabled",
+							tColor.useCssColorVariable,
+						);
 
-					saveAndApply()
-					this.display()
-				})
+						saveAndApply();
+						this.display();
+					});
 
-			btn.buttonEl.toggleClass("ftc-format-item-enabled", tColor.useCssColorVariable);
-		})
+				btn.buttonEl.toggleClass(
+					"fth-format-item-enabled",
+					tColor.useCssColorVariable,
+				);
+			})
 
 			// UP-DONW
-			.addButton(btn => {
-				btn
-					.setIcon("chevron-up")
+			.addButton((btn) => {
+				btn.setIcon("chevron-up")
 					.setTooltip("move item up")
-					.setClass("ftc-move-btn-left")
+					.setClass("fth-move-btn-left")
 
-					.onClick(async _ => {
-						moveColor(count - 1, -1, this.plugin.settings, themeindex);
+					.onClick(async (_) => {
+						moveColor(
+							count - 1,
+							-1,
+							this.plugin.settings,
+							themeindex,
+						);
 						await this.plugin.saveSettings();
 						this.display();
-					})
+					});
 			})
-			.addButton(btn => {
-				btn
-					.setIcon("chevron-down")
+			.addButton((btn) => {
+				btn.setIcon("chevron-down")
 					.setTooltip("move item down")
-					.setClass("ftc-move-btn-right")
+					.setClass("fth-move-btn-right")
 
-					.onClick(async _ => {
-						moveColor(count - 1, 1, this.plugin.settings, themeindex);
+					.onClick(async (_) => {
+						moveColor(
+							count - 1,
+							1,
+							this.plugin.settings,
+							themeindex,
+						);
 						await this.plugin.saveSettings();
 						this.display();
-					})
+					});
 			})
 
 			// DELETE
-			.addButton(btn => {
-				btn
-					.setIcon("trash")
+			.addButton((btn) => {
+				btn.setIcon("trash")
 					.setTooltip("delete color")
-					.setClass("ftc-move-btn-right")
+					.setClass("fth-move-btn-right")
 
-					.onClick(async _ => {
-						if (await confirmByModal(this.app,
-							`Colored section whith the id "${tColor.id}" will no longer be colored until you add another color with that id.`,
-							`Delete color: ${tColor.id}`)) {
-							getColors(this.plugin.settings, themeindex).remove(tColor);
+					.onClick(async (_) => {
+						if (
+							await confirmByModal(
+								this.app,
+								`Highlighted section whith the id "${tColor.id}" will no longer be highlighted until you add another color with that id.`,
+								`Delete color: ${tColor.id}`,
+							)
+						) {
+							getColors(this.plugin.settings, themeindex).remove(
+								tColor,
+							);
 						}
 						await this.plugin.saveSettings();
 						this.display();
-					})
-			})
+					});
+			});
 	}
 }
 
 // moving up means decreasing index
-function moveColor(index: number, direction: number, settings: FastTextColorPluginSettings, themeindex: number) {
-	if ((direction < 0 && index == 0) || (direction > 0 && index == getColors(settings).length - 1)) {
+function moveColor(
+	index: number,
+	direction: number,
+	settings: FastTextColorPluginSettings,
+	themeindex: number,
+) {
+	if (
+		(direction < 0 && index == 0) ||
+		(direction > 0 && index == getColors(settings).length - 1)
+	) {
 		return;
 	}
 	let colors = getColors(settings, themeindex);

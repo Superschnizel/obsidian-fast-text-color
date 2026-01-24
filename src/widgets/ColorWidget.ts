@@ -1,6 +1,10 @@
 import { EditorView, WidgetType } from "@codemirror/view";
 import { LatestColor } from "../color/TextColor";
-import { CSS_COLOR_PREFIX, getColors, VAR_COLOR_PREFIX } from "../FastTextColorSettings"
+import {
+	CSS_COLOR_PREFIX,
+	getColors,
+	VAR_COLOR_PREFIX,
+} from "../FastTextColorSettings";
 import { Menu } from "obsidian";
 import { settingsFacet } from "src/SettingsFacet";
 
@@ -13,7 +17,13 @@ export class ColorWidget extends WidgetType {
 
 	menu: Menu | null;
 
-	constructor(id: string, from: number, to: number, expressionTo: number, themeName: string) {
+	constructor(
+		id: string,
+		from: number,
+		to: number,
+		expressionTo: number,
+		themeName: string,
+	) {
 		super();
 		this.id = id;
 		this.from = from;
@@ -24,8 +34,8 @@ export class ColorWidget extends WidgetType {
 
 	toDOM(view: EditorView): HTMLElement {
 		const div = document.createElement("span");
-		div.addClass(`${CSS_COLOR_PREFIX}${this.themeName}-${this.id}`)
-		div.addClass("ftc-color-delimiter")
+		div.addClass(`${CSS_COLOR_PREFIX}${this.themeName}-${this.id}`);
+		div.addClass("fth-color-delimiter");
 
 		div.innerText = "⬤";
 
@@ -33,15 +43,14 @@ export class ColorWidget extends WidgetType {
 
 		div.onclick = (event) => {
 			if (this.menu != null) {
-
 			}
 			view.dispatch({
 				selection: {
 					anchor: this.from,
-					head: this.to
-				}
-			})
-		}
+					head: this.to,
+				},
+			});
+		};
 
 		div.onmouseover = (event) => {
 			if (this.menu != null) {
@@ -50,48 +59,48 @@ export class ColorWidget extends WidgetType {
 
 			this.menu = new Menu();
 
-			getColors(settings).forEach(tColor => {
-				this.menu!.addItem(item => {
-					item
-						.setTitle(tColor.id)
-						.onClick(evt => {
+			getColors(settings).forEach((tColor) => {
+				this.menu!.addItem((item) => {
+					item.setTitle(tColor.id)
+						.onClick((evt) => {
 							LatestColor.getInstance().setColor(tColor);
 							view.dispatch({
 								changes: {
 									from: this.from,
 									to: this.to,
-									insert: tColor.id
-								}
-							})
+									insert: tColor.id,
+								},
+							});
 						})
 						.setIcon("palette");
 					// @ts-ignore
 					(item.dom as HTMLElement).addClass(tColor.className);
-				})
+				});
 			});
-			this.menu.addItem(item => {
-				item
-					.setTitle("Remove")
+			this.menu.addItem((item) => {
+				item.setTitle("Remove")
 					.setIcon("ban")
-					.onClick(evt => {
+					.onClick((evt) => {
 						view.dispatch({
-							changes: [{
-								from: this.from - 3,
-								to: this.to + 1,
-								insert: ''
-							}, {
-								from: this.expressionTo - 2,
-								to: this.expressionTo,
-								insert: ''
-							}
-							]
-						})
-					})
-			})
+							changes: [
+								{
+									from: this.from - 3,
+									to: this.to + 1,
+									insert: "",
+								},
+								{
+									from: this.expressionTo - 2,
+									to: this.expressionTo,
+									insert: "",
+								},
+							],
+						});
+					});
+			});
 
 			const rect = div.getBoundingClientRect();
-			this.menu.showAtPosition({ x: rect.left, y: rect.bottom })
-		}
+			this.menu.showAtPosition({ x: rect.left, y: rect.bottom });
+		};
 
 		// div.onmouseout does not work. will close menu whenever the delimiter is not under the mouse.
 

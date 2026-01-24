@@ -24,6 +24,11 @@ export class TextColor {
 
 	// new: text color for highlighted text
 	textColor: string;
+	useDefaultTextColor: boolean;
+
+	// highlight styling
+	highlightStyle: CycleState;
+	borderRadius: CycleState;
 
 	/**
 	 * Create a basic Text Color
@@ -37,6 +42,10 @@ export class TextColor {
 	 * @param {number} [line_mode_index] - the index for the line mode
 	 * @param {string} [keybind] - the associated keybind
 	 * @param {string} colorVariable - the builtin Css color variable that this color uses.
+	 * @param {string} [textColor] - the foreground text color
+	 * @param {number} [highlight_style_index] - the index for highlight style (0=full, 1=underline)
+	 * @param {number} [border_radius_index] - the index for border radius (0=none, 1=small, 2=medium, 3=large)
+	 * @param {boolean} [useDefaultTextColor] - use Obsidian's default text color instead of custom color
 	 */
 	constructor(
 		color: string,
@@ -50,6 +59,9 @@ export class TextColor {
 		useCssColorVariable: boolean = false,
 		colorVariable: string = "--color-base-00",
 		textColor: string = "#000000",
+		highlight_style_index: number = 0,
+		border_radius_index: number = 0,
+		useDefaultTextColor: boolean = false,
 	) {
 		this.color = color;
 		this.id = id;
@@ -67,11 +79,22 @@ export class TextColor {
 			line_mode_index,
 		);
 
+		// highlight styling
+		this.highlightStyle = new CycleState(
+			["full", "underline"],
+			highlight_style_index,
+		);
+		this.borderRadius = new CycleState(
+			["none", "small", "medium", "large"],
+			border_radius_index,
+		);
+
 		this.useCssColorVariable = useCssColorVariable;
 		this.colorVariable = colorVariable;
 
 		this.className = `${CSS_COLOR_PREFIX}${themeName}-${this.id}`;
 		this.textColor = textColor;
+		this.useDefaultTextColor = useDefaultTextColor;
 	}
 
 	getColorValue(): string {
@@ -81,10 +104,21 @@ export class TextColor {
 	}
 
 	getCssDeclarations(settings?: FastTextColorPluginSettings): string[] {
-		return [
+		// Determine border radius value
+		const getBorderRadius = () => {
+			switch (this.borderRadius.state) {
+				case "small": return "3px";
+				case "medium": return "6px";
+				case "large": return "10px";
+				default: return "0";
+			}
+		};
+
+		// Base declarations for full highlight style
+		const baseDeclarations = [
 			`--fth-color: ${this.getColorValue()};`,
-			`background-color: var(--fth-color);`,
-			`color: ${this.textColor};`,
+			// Use inherit if useDefaultTextColor is true, otherwise use custom color
+			this.useDefaultTextColor ? "" : `color: ${this.textColor};`,
 			this.italic ? "font-style: italic;" : "",
 			this.bold ? "font-weight: bold;" : "",
 			this.line_mode.state != "none"
@@ -98,7 +132,25 @@ export class TextColor {
 			settings?.colorCodeSection
 				? "--code-normal: var(--fth-color);"
 				: "",
-		].filter(Boolean);
+		];
+
+		// Add highlight style specific CSS
+		if (this.highlightStyle.state === "underline") {
+			// Thick underline style
+			return [
+				...baseDeclarations,
+				`border-bottom: 0.25em solid var(--fth-color);`,
+				`padding-bottom: 0.1em;`,
+			].filter(Boolean);
+		} else {
+			// Full background highlight style (default)
+			return [
+				...baseDeclarations,
+				`background-color: var(--fth-color);`,
+				`padding: 0.1em 0.3em;`,
+				this.borderRadius.state !== "none" ? `border-radius: ${getBorderRadius()};` : "",
+			].filter(Boolean);
+		}
 	}
 
 	getCssClass(settings?: FastTextColorPluginSettings): string {

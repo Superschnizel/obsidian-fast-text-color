@@ -43,6 +43,9 @@ export const BUILTIN_COLORS = [
 		true,
 		"--color-red",
 		"#ffffff",
+		0,
+		0,
+		false,
 	),
 	new TextColor(
 		"#000000",
@@ -56,6 +59,9 @@ export const BUILTIN_COLORS = [
 		true,
 		"--color-orange",
 		"#000000",
+		0,
+		0,
+		false,
 	),
 	new TextColor(
 		"#000000",
@@ -69,6 +75,9 @@ export const BUILTIN_COLORS = [
 		true,
 		"--color-yellow",
 		"#000000",
+		0,
+		0,
+		false,
 	),
 	new TextColor(
 		"#000000",
@@ -82,6 +91,9 @@ export const BUILTIN_COLORS = [
 		true,
 		"--color-green",
 		"#000000",
+		0,
+		0,
+		false,
 	),
 	new TextColor(
 		"#000000",
@@ -95,6 +107,9 @@ export const BUILTIN_COLORS = [
 		true,
 		"--color-cyan",
 		"#000000",
+		0,
+		0,
+		false,
 	),
 	new TextColor(
 		"#000000",
@@ -108,6 +123,9 @@ export const BUILTIN_COLORS = [
 		true,
 		"--color-blue",
 		"#ffffff",
+		0,
+		0,
+		false,
 	),
 	new TextColor(
 		"#000000",
@@ -121,6 +139,9 @@ export const BUILTIN_COLORS = [
 		true,
 		"--color-purple",
 		"#ffffff",
+		0,
+		0,
+		false,
 	),
 	new TextColor(
 		"#000000",
@@ -134,6 +155,9 @@ export const BUILTIN_COLORS = [
 		true,
 		"--color-pink",
 		"#000000",
+		0,
+		0,
+		false,
 	),
 ];
 
@@ -150,6 +174,9 @@ export const DEFAULT_COLORS = [
 		false,
 		"--color-base-00",
 		"#ffffff",
+		0,
+		0,
+		false,
 	),
 	new TextColor(
 		"#00ff00",
@@ -163,6 +190,9 @@ export const DEFAULT_COLORS = [
 		false,
 		"--color-base-00",
 		"#000000",
+		0,
+		0,
+		false,
 	),
 	new TextColor(
 		"#0000ff",
@@ -176,6 +206,9 @@ export const DEFAULT_COLORS = [
 		false,
 		"--color-base-00",
 		"#ffffff",
+		0,
+		0,
+		false,
 	),
 	new TextColor(
 		"#00ffff",
@@ -189,6 +222,9 @@ export const DEFAULT_COLORS = [
 		false,
 		"--color-base-00",
 		"#000000",
+		0,
+		0,
+		false,
 	),
 	new TextColor(
 		"#ff00ff",
@@ -202,6 +238,9 @@ export const DEFAULT_COLORS = [
 		false,
 		"--color-base-00",
 		"#000000",
+		0,
+		0,
+		false,
 	),
 	new TextColor(
 		"#ffff00",
@@ -215,6 +254,9 @@ export const DEFAULT_COLORS = [
 		false,
 		"--color-base-00",
 		"#000000",
+		0,
+		0,
+		false,
 	),
 	new TextColor(
 		"#000000",
@@ -228,6 +270,9 @@ export const DEFAULT_COLORS = [
 		false,
 		"--color-base-00",
 		"#ffffff",
+		0,
+		0,
+		false,
 	),
 ];
 
@@ -370,6 +415,12 @@ export function updateSettings(settings: any): FastTextColorPluginSettings {
 					color.cap_mode.index,
 					color.line_mode.index,
 					color.keybind,
+					false,
+					"--color-base-00",
+					"#000000",
+					0,
+					0,
+					false,
 				);
 			});
 			const outSettings: FastTextColorPluginSettings = {
@@ -562,6 +613,9 @@ export class FastTextColorPluginSettingTab extends PluginSettingTab {
 							false,
 							"--color-base-00",
 							"#000000",
+							0,
+							0,
+							false,
 						),
 					);
 					await this.plugin.saveSettings();
@@ -654,7 +708,7 @@ export class FastTextColorPluginSettingTab extends PluginSettingTab {
 		const exampletext = nameDiv.createDiv();
 		// exampletext.addClass(`${CSS_COLOR_PREFIX}${tColor.id}`);
 		exampletext.setAttr("style", tColor.getCssInlineStyle());
-		exampletext.innerText = `~%{${tColor.id}}This is highlighted text}%~`;
+		exampletext.innerText = `~%{${tColor.id}}Your text}%~`;
 
 		// utility function to apply settings and update displaytext
 		let saveAndApply = async () => {
@@ -806,7 +860,7 @@ export class FastTextColorPluginSettingTab extends PluginSettingTab {
 						);
 					});
 
-				btn.buttonEl.addClass("fth-format-right");
+				btn.buttonEl.addClass("fth-format-middle");
 				btn.buttonEl.toggleClass(
 					"fth-format-item-enabled",
 					tColor.cap_mode.state != "normal",
@@ -817,6 +871,52 @@ export class FastTextColorPluginSettingTab extends PluginSettingTab {
 						: tColor.cap_mode.state == "small_caps"
 							? { fontVariant: "small_caps" }
 							: {},
+				);
+			})
+			.addButton((btn) => {
+				btn.setButtonText("H")
+					.setTooltip("Highlight style (full / underline)")
+					.setClass("fth-format-item")
+
+					.onClick(async (evt) => {
+						// cycle through highlight styles
+						tColor.highlightStyle.cycle();
+
+						btn.buttonEl.toggleClass(
+							"fth-format-item-enabled",
+							tColor.highlightStyle.state != "full",
+						);
+
+						saveAndApply();
+					});
+
+				btn.buttonEl.addClass("fth-format-middle");
+				btn.buttonEl.toggleClass(
+					"fth-format-item-enabled",
+					tColor.highlightStyle.state != "full",
+				);
+			})
+			.addButton((btn) => {
+				btn.setButtonText("R")
+					.setTooltip("Border roundedness (none|small|med|rounded)")
+					.setClass("fth-format-item")
+
+					.onClick(async (evt) => {
+						// cycle through border radius options
+						tColor.borderRadius.cycle();
+
+						btn.buttonEl.toggleClass(
+							"fth-format-item-enabled",
+							tColor.borderRadius.state != "none",
+						);
+
+						saveAndApply();
+					});
+
+				btn.buttonEl.addClass("fth-format-right");
+				btn.buttonEl.toggleClass(
+					"fth-format-item-enabled",
+					tColor.borderRadius.state != "none",
 				);
 			});
 
@@ -856,19 +956,32 @@ export class FastTextColorPluginSettingTab extends PluginSettingTab {
 		// Text color picker (foreground) - always show
 		new Setting(container)
 			.setName("Text color (foreground)")
+			.setDesc("Custom text color for highlighted text")
+			.addToggle((toggle) => {
+				toggle
+					.setTooltip("Use Obsidian's default text color")
+					.setValue(tColor.useDefaultTextColor)
+					.onChange(async (value) => {
+						tColor.useDefaultTextColor = value;
+						saveAndApply();
+					});
+			})
 			.addColorPicker((cb) => {
 				// Handle undefined, null, or "inherit" by defaulting to #000000
-				const initialTextColor = tColor.textColor && tColor.textColor !== "inherit" ? tColor.textColor : "#000000";
+				const initialTextColor =
+					tColor.textColor && tColor.textColor !== "inherit"
+						? tColor.textColor
+						: "#000000";
 				// Also update the actual value to avoid "inherit" being saved
 				if (!tColor.textColor || tColor.textColor === "inherit") {
 					tColor.textColor = "#000000";
 				}
-				cb.setValue(initialTextColor).onChange(
-					async (value) => {
+				cb.setValue(initialTextColor)
+					.setDisabled(tColor.useDefaultTextColor)
+					.onChange(async (value) => {
 						tColor.textColor = value;
 						saveAndApply();
-					},
-				);
+					});
 			});
 
 		// COLOR

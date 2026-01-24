@@ -215,6 +215,9 @@ export default class FastTextColorPlugin extends Plugin {
 					obj.useCssColorVariable,
 					obj.colorVariable,
 					textColor,
+					obj.highlightStyle?.index ?? 0,
+					obj.borderRadius?.index ?? 0,
+					obj.useDefaultTextColor ?? false,
 				);
 			}
 		}

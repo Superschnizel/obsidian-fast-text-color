@@ -1,6 +1,8 @@
-# Fast Text Color
+# Fast Text Highlight
 
-This Obsidian plugin allows you to create beautifully highlighted interactive notes using a custom coloring syntax.
+> **Note:** This is a fork of [Fast Text Color](https://github.com/Superschnizel/obisdian-fast-text-color) by user [Superschnizel](https://github.com/Superschnizel/) adapted specifically for highlighting text with enhanced styling options.
+
+This Obsidian plugin allows you to create beautifully highlighted interactive notes using a custom syntax with extensive highlighting customization.
 
 <img src="https://github.com/Superschnizel/obisdian-fast-text-color/assets/47162464/422a5839-d352-4f44-99d1-e76311a54900" width="75%">
 
@@ -38,14 +40,38 @@ The formatting options include:
 - _Italics_
 - <ins>Under</ins>-, o̅v̅e̅r̅-, and ~~through~~lines
 - FULL CAPS, Sᴍᴀʟʟ Cᴀᴘs
+- **Highlight Style**: Full background or thick underline
+- **Border Roundedness**: Sharp corners to fully rounded (4 levels)
+- **Foreground Text Color**: Custom color or inherit from Obsidian theme
 
 These options are handled using CSS classes, which means that any changes will be applied to preexisting sections marked with the respective id retroactively.
+
+### Enhanced Highlighting Features
+
+This fork adds several new styling options specifically designed for text highlighting:
+
+#### Highlight Style (H Button)
+Toggle between two highlight modes:
+- **Full Background** (default): Traditional solid background highlight with padding
+- **Underline**: Thick colored underline (0.25em) beneath the text
+
+#### Border Roundedness (R Button)
+Cycle through four corner styles for full background highlights:
+- **None** (default): Sharp corners
+- **Small**: Subtle rounding (3px)
+- **Medium**: Moderate rounding (6px)
+- **Large**: Pronounced rounding (10px)
+
+#### Foreground Text Color
+Each highlight can have a custom text color with two options:
+- **Custom Color**: Choose any color via the color picker
+- **Use Obsidian Default** (toggle): Inherit the text color from your current Obsidian theme, ensuring perfect theme compatibility in both light and dark modes
+
+All settings are configured per-color in the theme editor and apply retroactively to all text using that color ID.
 
 ### Themes
 
 Colors are bundled into themes, which can be created and edited in the plugin settings. You can also pick the global active theme there.
-
-If you want to override your global active theme for a specific note, you can do so by setting the frontmatter property `ftcTheme` to the name of the theme you wish to use.
 
 ### Applying Color
 
@@ -76,24 +102,8 @@ You can select a color by clicking the corresponding button or using the keybind
 	<img src="https://github.com/Superschnizel/obisdian-fast-text-color/assets/47162464/e6c02305-fc4c-4325-be4b-41dc2f1155dc" width="49%">
 </p>
 
-## Known Issues
-
-These issues mainly arise from the different techniques required for live preview and reading mode and will be fixed in the future.
-
 - **Reading Mode**.
     - An unopened closing delimiter `}%~` will lead to problems in reading mode.
-
-## Planned Features
-
-- [x] Selectable color themes
-- [ ] More/better ways to apply color
-    - [x] Submenu in editor context menu
-        - [ ] Suggester modal
-- [x] Changing color through interactive delimiter
-- [ ] Individual commands for theme colors
-- [ ] Automatically color by keyword
-- [ ] More (custom) CSS options
-- [ ] Full note commands (color by keyword etc.)
 
 ## How It Works
 

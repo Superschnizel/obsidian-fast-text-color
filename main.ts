@@ -81,8 +81,8 @@ export default class FastTextColorPlugin extends Plugin {
 		);
 
 		this.addCommand({
-			id: "change-text-color",
-			name: "Change text color",
+			id: "change-highlight-color",
+			name: "Change highlight color",
 			editorCallback: (editor: Editor) => {
 				// for this to work, needs to be in editor mode
 				this.openColorMenu(editor);
@@ -90,16 +90,16 @@ export default class FastTextColorPlugin extends Plugin {
 		});
 
 		this.addCommand({
-			id: "text-color-latestcolor",
-			name: "Apply latest color",
+			id: "highlight-color-latestcolor",
+			name: "Apply latest highlight color",
 			editorCallback: (editor: Editor) => {
 				applyColor(LatestColor.getInstance().getColor(), editor);
 			},
 		});
 
 		this.addCommand({
-			id: "remove-text-color",
-			name: "Remove text color",
+			id: "remove-highlight-color",
+			name: "Remove highlight",
 			editorCallback: (editor, view) => {
 				// @ts-expect-error, not typed
 				const editorView = view.editor.cm as EditorView;
@@ -116,7 +116,7 @@ export default class FastTextColorPlugin extends Plugin {
 				}
 				menu.addItem((item) => {
 					item.setSection("selection")
-						.setTitle("Color")
+						.setTitle("Highlight")
 						.setIcon("palette");
 					// @ts-ignore
 					const submenu: Menu = item.setSubmenu();
@@ -201,6 +201,8 @@ export default class FastTextColorPlugin extends Plugin {
 			const colors = getColors(this.settings, j);
 			for (let i = 0; i < colors.length; i++) {
 				let obj: TextColor = colors[i];
+				// Use saved textColor, but replace undefined, null, or "inherit" with "#000000"
+				const textColor = obj.textColor && obj.textColor !== "inherit" ? obj.textColor : "#000000";
 				colors[i] = new TextColor(
 					obj.color,
 					obj.id,
@@ -212,7 +214,7 @@ export default class FastTextColorPlugin extends Plugin {
 					obj.keybind,
 					obj.useCssColorVariable,
 					obj.colorVariable,
-					obj.textColor ?? "#000000",
+					textColor,
 				);
 			}
 		}

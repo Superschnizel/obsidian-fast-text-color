@@ -49,7 +49,7 @@ export class TextColor {
 		keybind: string = "",
 		useCssColorVariable: boolean = false,
 		colorVariable: string = "--color-base-00",
-		textColor: string = "inherit",
+		textColor: string = "#000000",
 	) {
 		this.color = color;
 		this.id = id;

@@ -27,7 +27,7 @@ export const textColorPostProcessor = (
 	const emergencyCopy = el.cloneNode(true);
 
 	try {
-		rebuildNode(el, themeName);
+		rebuildNode(el, themeName, settings);
 	} catch (e) {
 		console.error(`fatal in rebuildNode: ${e}`);
 		// readd from emergency Copy. should be removed as soon as node rebuilding is stable.
@@ -55,6 +55,7 @@ export const textColorPostProcessor = (
 function rebuildNode(
 	node: Node,
 	themeName: string,
+	settings: FastTextColorPluginSettings,
 	level: number = 0,
 	nodeStack: Node[] = [],
 ): Node {
@@ -97,7 +98,7 @@ function rebuildNode(
 		// console.debug(`node: ${childNode.nodeName}, level: ${level}`);
 		if (childNode.nodeType != Node.TEXT_NODE) {
 			// if childnode is not textnode, handle recursively.
-			childNode = rebuildNode(childNode, themeName, level + 1, nodeStack);
+			childNode = rebuildNode(childNode, themeName, settings, level + 1, nodeStack);
 
 			// nodeStack.last()?.appendChild(rebuildNode(childNode, themeName, level + 1));
 			continue;
@@ -148,6 +149,7 @@ function rebuildNode(
 			let colorSpan = document.createElement("span");
 			colorSpan.addClass(`${CSS_COLOR_PREFIX}${themeName}-${color}`);
 			// Set the text color style directly from settings
+			// TODO: FIX
 			try {
 				// Find the color object from settings
 				const theme = settings.themes.find((t) => t.name === themeName);

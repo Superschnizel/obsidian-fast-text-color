@@ -554,6 +554,14 @@ export class FastTextColorPluginSettingTab extends PluginSettingTab {
 							"#ffffff",
 							newColorName,
 							getCurrentTheme(settings, this.editThemeIndex).name,
+							false,
+							false,
+							0,
+							0,
+							"",
+							false,
+							"--color-base-00",
+							"#000000",
 						),
 					);
 					await this.plugin.saveSettings();
@@ -849,7 +857,13 @@ export class FastTextColorPluginSettingTab extends PluginSettingTab {
 		new Setting(container)
 			.setName("Text color (foreground)")
 			.addColorPicker((cb) => {
-				cb.setValue(tColor.textColor ?? "#000000").onChange(
+				// Handle undefined, null, or "inherit" by defaulting to #000000
+				const initialTextColor = tColor.textColor && tColor.textColor !== "inherit" ? tColor.textColor : "#000000";
+				// Also update the actual value to avoid "inherit" being saved
+				if (!tColor.textColor || tColor.textColor === "inherit") {
+					tColor.textColor = "#000000";
+				}
+				cb.setValue(initialTextColor).onChange(
 					async (value) => {
 						tColor.textColor = value;
 						saveAndApply();

@@ -888,6 +888,32 @@ export class FastTextColorPluginSettingTab extends PluginSettingTab {
 						);
 
 						saveAndApply();
+
+						// Also update the Roundedness button enabled/disabled state immediately
+						const roundedBtn =
+							btn.buttonEl.parentElement?.querySelector(
+								".fth-format-right",
+							);
+						if (roundedBtn) {
+							if (
+								tColor.highlightStyle &&
+								tColor.highlightStyle.state !== "full"
+							) {
+								(roundedBtn as HTMLButtonElement).disabled =
+									true;
+								roundedBtn.setAttribute(
+									"title",
+									"Border roundedness is only available when Highlight style is 'full'.",
+								);
+							} else {
+								(roundedBtn as HTMLButtonElement).disabled =
+									false;
+								roundedBtn.setAttribute(
+									"title",
+									"Border roundedness (none|small|med|rounded)",
+								);
+							}
+						}
 					});
 
 				btn.buttonEl.addClass("fth-format-middle");
@@ -905,19 +931,40 @@ export class FastTextColorPluginSettingTab extends PluginSettingTab {
 						// cycle through border radius options
 						tColor.borderRadius.cycle();
 
-						btn.buttonEl.toggleClass(
-							"fth-format-item-enabled",
-							tColor.borderRadius.state != "none",
-						);
+						// If cycling returns to 'none', ensure the button is not enabled
+						if (tColor.borderRadius.state === "none") {
+							btn.buttonEl.removeClass("fth-format-item-enabled");
+						} else {
+							btn.buttonEl.addClass("fth-format-item-enabled");
+						}
 
 						saveAndApply();
 					});
 
 				btn.buttonEl.addClass("fth-format-right");
-				btn.buttonEl.toggleClass(
-					"fth-format-item-enabled",
-					tColor.borderRadius.state != "none",
-				);
+				if (tColor.borderRadius.state !== "none") {
+					btn.buttonEl.addClass("fth-format-item-enabled");
+				} else {
+					btn.buttonEl.removeClass("fth-format-item-enabled");
+				}
+
+				// Disable the Border roundedness button if highlight style is not 'full'
+				if (
+					tColor.highlightStyle &&
+					tColor.highlightStyle.state !== "full"
+				) {
+					btn.setDisabled(true);
+					btn.buttonEl.setAttribute(
+						"title",
+						"Border roundedness is only available when Highlight style is 'full'.",
+					);
+				} else {
+					btn.setDisabled(false);
+					btn.buttonEl.setAttribute(
+						"title",
+						"Border roundedness (none|small|med|rounded)",
+					);
+				}
 			});
 
 		// -------------------------------------------------------------

@@ -1,4 +1,5 @@
 import { EditorView, WidgetType } from "@codemirror/view";
+import { removeColor } from "../color/TextColorFunctions";
 import { LatestColor } from "../color/TextColor";
 import {
 	CSS_COLOR_PREFIX,
@@ -81,20 +82,15 @@ export class ColorWidget extends WidgetType {
 				item.setTitle("Remove")
 					.setIcon("ban")
 					.onClick((evt) => {
-						view.dispatch({
-							changes: [
-								{
-									from: this.from - 3,
-									to: this.to + 1,
-									insert: "",
-								},
-								{
-									from: this.expressionTo - 2,
-									to: this.expressionTo,
-									insert: "",
-								},
-							],
-						});
+						// Use the same logic as the Command Palette remove feature
+						removeColor(
+							{
+								// @ts-ignore: Editor and EditorView are compatible for this usage
+								state: view.state,
+								dispatch: view.dispatch.bind(view),
+							},
+							view,
+						);
 					});
 			});
 

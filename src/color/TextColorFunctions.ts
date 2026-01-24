@@ -120,26 +120,33 @@ export function removeColor(editor: Editor, view: EditorView) {
 			}
 
 			const TcLeft = node.getChild("TcLeft");
-			const Rmarker = node
-				.getChild("TcRight")
-				?.getChild("REnd")
-				?.getChild("RMarker");
+			const TcRight = node.getChild("TcRight");
+			const Rmarker = TcRight?.getChild("REnd")?.getChild("RMarker");
 
-			view.dispatch({
-				changes: [
-					{
-						from: TcLeft ? TcLeft.from : 0,
-						to: TcLeft ? TcLeft.to : 0,
+			// Remove the left marker, the right marker, and any trailing '}' left behind
+			let changes = [];
+			if (TcLeft) {
+				changes.push({ from: TcLeft.from, to: TcLeft.to, insert: "" });
+			}
+			if (Rmarker) {
+				changes.push({
+					from: Rmarker.from,
+					to: Rmarker.to,
+					insert: "",
+				});
+				// Try to remove a trailing '}' if it exists right after the Rmarker
+				const doc = view.state.doc;
+				const afterRmarker = Rmarker.to;
+				if (doc.sliceString(afterRmarker, afterRmarker + 1) === "}") {
+					changes.push({
+						from: afterRmarker,
+						to: afterRmarker + 1,
 						insert: "",
-					},
-					{
-						from: Rmarker ? Rmarker.from : 0,
-						to: Rmarker ? Rmarker.to : 0,
-						insert: "",
-					},
-				],
-			});
+					});
+				}
+			}
 
+			view.dispatch({ changes });
 			return;
 		}
 		return;

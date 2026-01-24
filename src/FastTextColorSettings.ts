@@ -882,6 +882,18 @@ export class FastTextColorPluginSettingTab extends PluginSettingTab {
 						// cycle through highlight styles
 						tColor.highlightStyle.cycle();
 
+						// If switching to underline, set roundedness to none
+						if (tColor.highlightStyle.state === "underline") {
+							tColor.borderRadius.index = 0;
+							tColor.borderRadius.state = "none";
+						}
+
+						// Force update of preview inline style regardless of direction
+						exampletext.setAttr(
+							"style",
+							tColor.getCssInlineStyle(),
+						);
+
 						btn.buttonEl.toggleClass(
 							"fth-format-item-enabled",
 							tColor.highlightStyle.state != "full",
@@ -1011,6 +1023,10 @@ export class FastTextColorPluginSettingTab extends PluginSettingTab {
 				.addColorPicker((cb) => {
 					cb.setValue(tColor.color).onChange(async (value) => {
 						tColor.color = value;
+						// If using default, set textColor to 'inherit' so it doesn't override vault
+						if (value) {
+							tColor.textColor = "inherit";
+						}
 						saveAndApply();
 					});
 				});
@@ -1026,7 +1042,23 @@ export class FastTextColorPluginSettingTab extends PluginSettingTab {
 					.setValue(tColor.useDefaultTextColor)
 					.onChange(async (value) => {
 						tColor.useDefaultTextColor = value;
+						// Find the color picker input and enable/disable it
+						const parentSetting =
+							toggle.toggleEl.closest(".setting-item");
+						if (parentSetting) {
+							const colorInput = parentSetting.querySelector(
+								'input[type="color"]',
+							) as HTMLInputElement;
+							if (colorInput) {
+								colorInput.disabled = value;
+							}
+						}
 						saveAndApply();
+						// Also update the preview text immediately
+						exampletext.setAttr(
+							"style",
+							tColor.getCssInlineStyle(),
+						);
 					});
 			})
 			.addColorPicker((cb) => {

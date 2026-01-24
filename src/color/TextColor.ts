@@ -107,40 +107,50 @@ export class TextColor {
 		// Determine border radius value
 		const getBorderRadius = () => {
 			switch (this.borderRadius.state) {
-				case "small": return "3px";
-				case "medium": return "6px";
-				case "large": return "10px";
-				default: return "0";
+				case "small":
+					return "3px";
+				case "medium":
+					return "6px";
+				case "large":
+					return "10px";
+				default:
+					return "0";
 			}
 		};
 
-		// Base declarations for full highlight style
+		// Always use the passed-in settings for all relevant properties
 		const baseDeclarations = [
 			`--fth-color: ${this.getColorValue()};`,
-			// Use inherit if useDefaultTextColor is true, otherwise use custom color
-			this.useDefaultTextColor ? "" : `color: ${this.textColor};`,
+			// Only emit color if not using default and not 'inherit'
+			!this.useDefaultTextColor &&
+			this.textColor !== "inherit" &&
+			this.textColor
+				? `color: ${this.textColor};`
+				: "",
 			this.italic ? "font-style: italic;" : "",
 			this.bold ? "font-weight: bold;" : "",
-			this.line_mode.state != "none"
+			this.line_mode.state !== "none"
 				? `text-decoration: ${this.line_mode.state};`
 				: "",
-			this.cap_mode.state == "all_caps"
+			this.cap_mode.state === "all_caps"
 				? "text-transform: uppercase;"
-				: this.cap_mode.state == "small_caps"
+				: this.cap_mode.state === "small_caps"
 					? "font-variant: small-caps;"
 					: "",
-			settings?.colorCodeSection
+			settings && settings.colorCodeSection
 				? "--code-normal: var(--fth-color);"
 				: "",
 		];
 
 		// Add highlight style specific CSS
 		if (this.highlightStyle.state === "underline") {
-			// Thick underline style
+			// Underline style: remove background color
 			return [
 				...baseDeclarations,
 				`border-bottom: 0.25em solid var(--fth-color);`,
 				`padding-bottom: 0.1em;`,
+				// Explicitly remove background for underline style
+				`background-color: transparent !important;`,
 			].filter(Boolean);
 		} else {
 			// Full background highlight style (default)
@@ -148,7 +158,9 @@ export class TextColor {
 				...baseDeclarations,
 				`background-color: var(--fth-color);`,
 				`padding: 0.1em 0.3em;`,
-				this.borderRadius.state !== "none" ? `border-radius: ${getBorderRadius()};` : "",
+				this.borderRadius.state !== "none"
+					? `border-radius: ${getBorderRadius()};`
+					: "",
 			].filter(Boolean);
 		}
 	}

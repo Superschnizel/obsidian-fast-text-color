@@ -887,7 +887,23 @@ export class FastTextColorPluginSettingTab extends PluginSettingTab {
 							tColor.highlightStyle.state != "full",
 						);
 
-						saveAndApply();
+						await saveAndApply();
+						// Force re-apply CSS variables and refresh all color classes
+						if (
+							this.plugin &&
+							typeof this.plugin.setCssVariables === "function"
+						) {
+							this.plugin.setCssVariables();
+						}
+						// Force re-render of the workspace to update inline styles
+						if (
+							this.app &&
+							this.app.workspace &&
+							typeof this.app.workspace.updateOptions ===
+								"function"
+						) {
+							this.app.workspace.updateOptions();
+						}
 
 						// Also update the Roundedness button enabled/disabled state immediately
 						const roundedBtn =

@@ -1047,6 +1047,18 @@ export class FastTextColorPluginSettingTab extends PluginSettingTab {
 					.setValue(tColor.useDefaultTextColor)
 					.onChange(async (value) => {
 						tColor.useDefaultTextColor = value;
+						// Sync the textColor property in TextColor for immediate effect
+						if (value) {
+							tColor.textColor = "inherit";
+						} else {
+							// Restore to previous or default color if available
+							if (
+								!tColor.textColor ||
+								tColor.textColor === "inherit"
+							) {
+								tColor.textColor = "#000000";
+							}
+						}
 						// Find the color picker input and enable/disable it
 						const parentSetting =
 							toggle.toggleEl.closest(".setting-item");

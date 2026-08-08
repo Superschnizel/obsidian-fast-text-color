@@ -29,7 +29,7 @@ class TextColorViewPlugin implements PluginValue {
 		if (!isLivePreview(update.state)) {
 			// clear decorations
 			if (this.decorations.size > 0) {
-				this.decorations = new RangeSetBuilder < Decoration > ().finish();
+				this.decorations = new RangeSetBuilder<Decoration>().finish();
 			}
 			this.notLivePreview = true;
 
@@ -57,7 +57,7 @@ class TextColorViewPlugin implements PluginValue {
 	destroy() { }
 
 	buildDecorations(view: EditorView): DecorationSet {
-		const builder = new RangeSetBuilder < Decoration > ();
+		const builder = new RangeSetBuilder<Decoration>();
 
 		for (let { from, to } of view.visibleRanges) {
 			view.state.field(textColorParserField).tree.iterate({
@@ -78,10 +78,10 @@ class TextColorViewPlugin implements PluginValue {
 					// const cursorInside = view.state.selection.main.from <= node.to && view.state.selection.main.to >= node.from;
 
 					// I dont know why this needs a trycatch but if not there will be issues.
-					try { 
-						handleExpression(node, builder, view.state); 
-					} catch {
-						// console.log("there was an error!")
+					try {
+						handleExpression(node, builder, view.state);
+					} catch (error) {
+						console.log('there was an error when building decorations: ${error}')
 						return true;
 					}
 

@@ -41,7 +41,7 @@ export default class FastTextColorPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		this.styleElements = new Map < Window, HTMLElement | null > ();
+		this.styleElements = new Map<Window, HTMLElement | null>();
 
 		// setup Editor Extensions
 		this.registerEditorExtension(textColorParserField);
@@ -141,24 +141,33 @@ export default class FastTextColorPlugin extends Plugin {
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new FastTextColorPluginSettingTab(this.app, this));
 
-		this.app.workspace.on("window-open", (_, window) => {
-			this.styleElements.set(window, null);
+		this.registerEvent(
+			this.app.workspace.on("window-open", (_, window) => {
+				this.styleElements.set(window, null);
+				this.setCssVariables();
+			})
+		);
+		this.registerEvent(
+			this.app.workspace.on("window-close", (_, window) => {
+				this.styleElements.delete(window);
+			})
+		);
+
+		// this.styleElements.set(activeWindow, null);
+		// this.setCssVariables();
+		this.app.workspace.onLayoutReady(() => {
+			const mainWin = this.app.workspace.containerEl.win ?? window;
+			this.styleElements.set(mainWin, null);
 			this.setCssVariables();
 		});
-		this.app.workspace.on("window-close", (_, window) => { this.styleElements.delete(window) });
-
-		this.styleElements.set(activeWindow, null);
-
-		this.setCssVariables();
 	}
 
 	onunload() {
-		// this.styleElement.remove();
 		this.closeColorMenu();
-
-		// this.app.workspace.off("window-open", this.addWindow);
-		// this.app.workspace.off("window-close", this.removeWindow);
-		// remove editorextensions
+		this.styleElements.forEach((styleElement) => {
+			styleElement?.remove();
+		});
+		this.styleElements.clear();
 	}
 
 	async loadSettings() {
@@ -263,8 +272,8 @@ export default class FastTextColorPlugin extends Plugin {
 		if (this.colorMenu) {
 			this.colorMenu.remove();
 			this.colorMenu = null;
+			this.app.keymap.popScope(this.scope);
 		}
-		this.app.keymap.popScope(this.scope);
 	}
 
 	constructScope(editor: Editor) {

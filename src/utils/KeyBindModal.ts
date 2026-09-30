@@ -24,7 +24,8 @@ class KeyBindModal extends Modal {
 
 		this.handler = this.handleKeypress.bind(this);
 
-		window.addEventListener('keypress', this.handler);
+		// window.addEventListener('keypress', this.handler);
+		this.scope.register(null, null, this.handler);
 
 		new Setting(contentEl)
 			.addButton(btn => {
@@ -41,15 +42,15 @@ class KeyBindModal extends Modal {
 		contentEl.empty();
 	}
 
-	handleKeypress(evt: KeyboardEvent) {
+	handleKeypress(evt: KeyboardEvent, ctx: KeymapContext) {
 		this.result = evt.key.toUpperCase();
 
-		// console.log("Keypressed");
+		console.log("Keypressed");
 
 
 		this.modalEl.removeEventListener('keypress', this.handler, true);
 
-		// console.log("removed");
+		console.log("removed");
 
 		this.finished = true;
 	}

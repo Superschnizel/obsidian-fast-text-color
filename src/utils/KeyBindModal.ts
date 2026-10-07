@@ -1,4 +1,4 @@
-import { App, Modal, Setting } from "obsidian";
+import { App, Modal, Setting, KeymapContext } from "obsidian";
 
 class KeyBindModal extends Modal {
 	result: string;

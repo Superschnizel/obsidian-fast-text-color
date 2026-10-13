@@ -30,10 +30,7 @@ export default class FastTextColorPlugin extends Plugin {
 	colorMenu: HTMLDivElement | null | undefined;
 	scope: Scope;
 
-	styleElement: HTMLElement;
-	styleElements: Map<Window, HTMLElement | null>;
-
-	lastActiveDoc: Document;
+	styleSheets: Map<Window, CSSStyleSheet>;
 
 	settingsExtension: Extension;
 	settingsCompartment: Compartment;
@@ -41,7 +38,7 @@ export default class FastTextColorPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		this.styleElements = new Map<Window, HTMLElement | null>();
+		this.styleSheets = new Map<Window, CSSStyleSheet>();
 
 		// setup Editor Extensions
 		this.registerEditorExtension(textColorParserField);
@@ -146,31 +143,24 @@ export default class FastTextColorPlugin extends Plugin {
 
 		this.registerEvent(
 			this.app.workspace.on("window-open", (_, window) => {
-				this.styleElements.set(window, null);
-				this.setCssVariables();
+				this.addWindow(window);
 			})
 		);
 		this.registerEvent(
 			this.app.workspace.on("window-close", (_, window) => {
-				this.styleElements.delete(window);
+				this.removeWindow(window);
 			})
 		);
 
-		// this.styleElements.set(activeWindow, null);
-		// this.setCssVariables();
 		this.app.workspace.onLayoutReady(() => {
 			const mainWin = this.app.workspace.containerEl.win ?? window;
-			this.styleElements.set(mainWin, null);
-			this.setCssVariables();
+			this.addWindow(mainWin);
 		});
 	}
 
 	onunload() {
 		this.closeColorMenu();
-		this.styleElements.forEach((styleElement) => {
-			styleElement?.remove();
-		});
-		this.styleElements.clear();
+		[...this.styleSheets.keys()].forEach((win) => this.removeWindow(win));
 	}
 
 	async loadSettings() {
@@ -377,93 +367,64 @@ export default class FastTextColorPlugin extends Plugin {
 			.buttonEl.setAttr("style", `background-color: ${tColor.getColorValue()}`);
 	}
 
-	addWindow(window: Window) {
-		this.styleElements.set(window, null);
+	/**
+	 * creates a stylesheet for the window and adds it to the adopted stylesheets of its document.
+	 *
+	 * @param {Window} win
+	 */
+	addWindow(win: Window) {
+		if (this.styleSheets.has(win)) {
+			return;
+		}
+
+		// a constructed stylesheet can only be adopted by the document of the window it was created in.
+		const styleSheet = new (win as Window & typeof globalThis).CSSStyleSheet();
+		win.document.adoptedStyleSheets = [...win.document.adoptedStyleSheets, styleSheet];
+
+		this.styleSheets.set(win, styleSheet);
 		this.setCssVariables();
 	}
 
-	removeWindow(window: Window) {
-		this.styleElements.delete(window);
+	removeWindow(win: Window) {
+		const styleSheet = this.styleSheets.get(win);
+		if (!styleSheet) {
+			return;
+		}
+
+		win.document.adoptedStyleSheets = win.document.adoptedStyleSheets.filter(s => s !== styleSheet);
+		this.styleSheets.delete(win);
 	}
 
 	/**
-	 * creates the stylesheet needed for the colors in the root of the document.
+	 * fills the stylesheets needed for the colors in all known windows.
 	 * A different set of classes is created for each theme.
 	 *
 	 */
 	setCssVariables() {
-		// let styleElement = activeDocument.getElementById("fast-text-color-stylesheet");
-
-		// iterate over all known windows and create stylesheets if not already present.
-		this.styleElements.forEach((styleElement, win) => {
-			if (!styleElement) {
-				let root = win.document.querySelector(':root');
-
-				if (!root) {
-					return;
-				}
-
-				styleElement = root.createEl('style');
-				styleElement.id = "fast-text-color-stylesheet";
-
-				this.styleElements.set(win, styleElement);
+		const formatCss = (css: string) => {
+			const lines = css.split('\n').map(l => l.trim()).filter(l => l.length);
+			if (lines.length <= 5) { // format as a single line
+				return lines.join(' ');
 			}
+			return lines.map(l => /[{}]/.test(l) ? l : `  ${l}`).join('\n');
+		};
 
-			styleElement.textContent = "";
-			const formatCss = (css: string) => {
-				const lines = css.split('\n').map(l => l.trim()).filter(l => l.length);
-				if (lines.length <= 5) { // format as a single line
-					return lines.join(' ');
-				}
-				return lines.map(l => /[{}]/.test(l) ? l : `  ${l}`).join('\n');
-			};
-			// dynamically create stylesheet.
-			for (let i = 0; i < this.settings.themes.length; i++) {
-				getColors(this.settings, i).forEach((tColor: TextColor) => {
+		// dynamically create stylesheet.
+		let css = "";
+		for (let i = 0; i < this.settings.themes.length; i++) {
+			getColors(this.settings, i).forEach((tColor: TextColor) => {
 
-					const theme = this.settings.themes[i]
-					const className = `.${CSS_COLOR_PREFIX}${theme.name}-${tColor.id}`;
-					let cssClass = `${className} {\n${tColor.getInnerCss(this.settings)}\n}`;
+				const theme = this.settings.themes[i]
+				const className = `.${CSS_COLOR_PREFIX}${theme.name}-${tColor.id}`;
+				let cssClass = `${className} {\n${tColor.getInnerCss(this.settings)}\n}`;
 
-					styleElement!.textContent += formatCss(cssClass) + "\n";
-				});
-			}
+				css += formatCss(cssClass) + "\n";
+			});
+		}
+
+		this.styleSheets.forEach((styleSheet) => {
+			styleSheet.replaceSync(css);
 		});
-
-		// if (!this.styleElement || this.lastActiveDoc != activeDocument) {
-		// 	const root = activeDocument.querySelector(':root');
-		//
-		// 	this.lastActiveDoc = activeDocument;
-		//
-		// 	if (!root) {
-		// 		return;
-		// 	}
-		//
-		// 	this.styleElement = root.createEl('style');
-		// 	this.styleElement.id = "fast-text-color-stylesheet";
-		//
-		// }
-		//
-		// this.styleElement.textContent = "";
-		// const formatCss = (css: string) => {
-		// 	const lines = css.split('\n').map(l => l.trim()).filter(l => l.length);
-		// 	if (lines.length <= 5) { // format as a single line
-		// 		return lines.join(' ');
-		// 	}
-		// 	return lines.map(l => /[{}]/.test(l) ? l : `  ${l}`).join('\n');
-		// };
-		// // dynamically create stylesheet.
-		// for (let i = 0; i < this.settings.themes.length; i++) {
-		// 	getColors(this.settings, i).forEach((tColor: TextColor) => {
-		//
-		// 		const theme = this.settings.themes[i]
-		// 		const className = `.${CSS_COLOR_PREFIX}${theme.name}-${tColor.id}`;
-		// 		let cssClass = `${className} {\n${tColor.getInnerCss(this.settings)}\n}`;
-		//
-		// 		this.styleElement!.textContent += formatCss(cssClass) + "\n";
-		// 	});
-		// }
-
 	}
 }
 

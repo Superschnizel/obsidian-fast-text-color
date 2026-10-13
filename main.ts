@@ -70,6 +70,7 @@ export default class FastTextColorPlugin extends Plugin {
 
 		this.addCommand({
 			id: 'change-text-color',
+			icon: 'palette',
 			name: 'Change text color',
 			editorCallback: (editor: Editor) => { // for this to work, needs to be in editor mode
 				this.openColorMenu(editor);
@@ -78,6 +79,7 @@ export default class FastTextColorPlugin extends Plugin {
 
 		this.addCommand({
 			id: 'text-color-latestcolor',
+			icon: 'palette',
 			name: 'Apply latest color',
 			editorCallback: (editor: Editor) => {
 				applyColor(LatestColor.getInstance().getColor(), editor);
@@ -86,6 +88,7 @@ export default class FastTextColorPlugin extends Plugin {
 
 		this.addCommand({
 			id: 'remove-text-color',
+			icon: 'remove-formatting',
 			name: 'Remove text color',
 			editorCallback: (editor, view) => {
 				// @ts-expect-error, not typed
